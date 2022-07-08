@@ -21,3 +21,6 @@ done
 
 #the next step will be to use the tool rsem, which will output a customized txt file containing the expression of each gene
 #maybe a custom tool for this part based on what dr. sun wants
+
+
+

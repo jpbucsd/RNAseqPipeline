@@ -9,6 +9,8 @@ sudo apt-get install libncurses5-dev
 sudo apt-get install libncursesw5-dev
 sudo apt-get install liblzma-dev
 
+sudo apt-get install -y rna-star
+
 sudo apt install bwa
 sudo apt install samtools
 
