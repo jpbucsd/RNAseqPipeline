@@ -59,10 +59,10 @@ then
 	echo "indexing"
 	mkdir refGen
 	cd refGen
-	#wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_genomic.fna.gz
-	#wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_genomic.gtf.gz
-	#gzip -d GCF_000001405.40_GRCh38.p14_genomic.fna.gz
-	#gzip -d GCF_000001405.40_GRCh38.p14_genomic.gtf.gz
+	wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_genomic.fna.gz
+	wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_genomic.gtf.gz
+	gzip -d GCF_000001405.40_GRCh38.p14_genomic.fna.gz
+	gzip -d GCF_000001405.40_GRCh38.p14_genomic.gtf.gz
         
 	#find number of chromsomes for star to work without crashing
 	#this has already been calculated and for now will be set to the calculated value of 22. if this number returns a value below 18 make it 18
