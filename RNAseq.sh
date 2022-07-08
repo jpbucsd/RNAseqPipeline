@@ -59,10 +59,10 @@ then
 	echo "indexing"
 	mkdir refGen
 	cd refGen
-	#wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_genomic.fna.gz
-	#wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_genomic.gtf.gz
-	#gzip -d GCF_000001405.40_GRCh38.p14_genomic.fna.gz
-	#gzip -d GCF_000001405.40_GRCh38.p14_genomic.gtf.gz
+	wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_genomic.fna.gz
+	wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_genomic.gtf.gz
+	gzip -d GCF_000001405.40_GRCh38.p14_genomic.fna.gz
+	gzip -d GCF_000001405.40_GRCh38.p14_genomic.gtf.gz
         
 	#find number of chromsomes for star to work without crashing
 	#this has already been calculated and for now will be set to the calculated value of 22. if this number returns a value below 18 make it 18
@@ -107,16 +107,29 @@ then
 	do
 		#the following line is the originally intended bwa command with $2 being an index genome in fna format or something.
 		#bwa mem $2 filename | samtools view -bS > ${filename}.bam
-		STAR --genomeDir refGen/genome --readFilesIn ${filename}
+		STAR --genomeDir refGen/genome --readFilesIn ${filename} --outFileNamePrefix ${filename%.*}
 	done
 	
 	for filename in $fqDir/*.fastq 
 	do
-		STAR --genomeDir refGen/genome --readFilesIn ${filename}
+		STAR --genomeDir refGen/genome --readFilesIn ${filename} --outFileNamePrefix ${filename%.*}
 		#bwa mem $2 filename | samtools view -bS > ${filename}.bam
 	done
 
 	#the next step will be to use the tool rsem, which will output a customized txt file containing the expression of each gene
 	#maybe a custom tool for this part based on what dr. sun wants
+
+	#quantifying gene expression
+
+	for filename in $fqDir/*fq
+	do
+		rsem-calculate-expression --bam "${filename%.*}Aligned.toTranscriptome.out.bam"
+	done
+	for filename in $fqDir/*fastq
+	do
+		rsem-calculate-expression --bam "${filename%.*}Aligned.toTranscriptome.out.bam"
+	done
+
+	#at this point we will have gene.results files?? and they can be used in the R language with Deseq2
 fi
 
