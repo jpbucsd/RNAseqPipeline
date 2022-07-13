@@ -78,7 +78,7 @@ then
 	mkdir genome
 	chmod -R 0777 genome
 	#star requires 36GB of ram and 12 threads
-	STAR --runMode genomeGenerate --genomeFastaFiles GCF_000001405.40_GRCh38.p14_genomic.fna --sjdbGTFfile GCF_000001405.40_GRCh38.p14_genomic.gtf --genomeDir genome --genomeChrBinNbits $factor
+	STAR --runMode genomeGenerate --genomeFastaFiles GCF_000001405.40_GRCh38.p14_genomic.fna --sjdbGTFfile GCF_000001405.40_GRCh38.p14_genomic.gtf --genomeDir genome --genomeChrBinNbits $factor --runThreadN 16
 
 		
 	#leave refGen to return to normal
