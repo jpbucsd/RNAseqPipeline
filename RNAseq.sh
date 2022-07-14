@@ -107,12 +107,12 @@ then
 	do
 		#the following line is the originally intended bwa command with $2 being an index genome in fna format or something.
 		#bwa mem $2 filename | samtools view -bS > ${filename}.bam
-		STAR --genomeDir refGen/genome --readFilesIn ${filename} --outFileNamePrefix ${filename%.*}
+		STAR --genomeDir refGen/genome --readFilesIn ${filename} --outFileNamePrefix ${filename%.*} --runThreadN 16
 	done
 	
 	for filename in $fqDir/*.fastq 
 	do
-		STAR --genomeDir refGen/genome --readFilesIn ${filename} --outFileNamePrefix ${filename%.*}
+		STAR --genomeDir refGen/genome --readFilesIn ${filename} --outFileNamePrefix ${filename%.*} --runThreadN 16
 		#bwa mem $2 filename | samtools view -bS > ${filename}.bam
 	done
 
@@ -123,11 +123,11 @@ then
 
 	for filename in $fqDir/*fq
 	do
-		rsem-calculate-expression --bam "${filename%.*}Aligned.toTranscriptome.out.bam"
+		rsem-calculate-expression --bam "${filename%.*}Aligned.toTranscriptome.out.bam" --num-threads 16
 	done
 	for filename in $fqDir/*fastq
 	do
-		rsem-calculate-expression --bam "${filename%.*}Aligned.toTranscriptome.out.bam"
+		rsem-calculate-expression --bam "${filename%.*}Aligned.toTranscriptome.out.bam" --num-threads 16
 	done
 
 	#at this point we will have gene.results files?? and they can be used in the R language with Deseq2
