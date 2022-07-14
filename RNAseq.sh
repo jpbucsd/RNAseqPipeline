@@ -3,13 +3,16 @@
 #important variables
 
 fqDir=""
+oDir=""
 indexF=0
 fqFlag=0
+oFlag=0
 align=1
 
 #usage of command line arguments
 #-h - help //todo
-#-f fastqdirectory 
+#-f fastqdirectory
+#-o output directory
 #-index (compute index) usage of index with no other arguments will cause only indexing to occur. without this flag indexing will not occur
 
 #input command line arguments
@@ -21,6 +24,10 @@ do
 		fqDir="$var"
 		align=2
 		#next check for other flags before -
+	elif [[ $oFlag == 1 ]]
+	then
+		oFlag=0
+		oDir="$var"/
 	elif [[ "$var" == "-"* ]]
 	then
 		if [[ "$var" == *"-i"* ]]
@@ -39,6 +46,10 @@ do
 			#fast q files coming up
 			fqFlag=1
 			align=2
+		fi
+		if [[ "$var" == *"-o"* ]]
+		then
+			oFlag=1
 		fi
 	else
 		#default choice to assume fqdir if fqdir is empty
@@ -102,17 +113,19 @@ then
 	do
 		tar xzvf ${filename}
 	done
+	
+	mkdir ${oDir%/}
 
 	for filename in $fqDir/*.fq 
 	do
 		#the following line is the originally intended bwa command with $2 being an index genome in fna format or something.
 		#bwa mem $2 filename | samtools view -bS > ${filename}.bam
-		STAR --genomeDir refGen/genome --readFilesIn ${filename} --outFileNamePrefix ${filename%.*} --runThreadN 16
+		STAR --genomeDir refGen/genome --readFilesIn ${filename} --outFileNamePrefix "$oDir${filename%.*}" --runThreadN 16
 	done
 	
 	for filename in $fqDir/*.fastq 
 	do
-		STAR --genomeDir refGen/genome --readFilesIn ${filename} --outFileNamePrefix ${filename%.*} --runThreadN 16
+		STAR --genomeDir refGen/genome --readFilesIn ${filename} --outFileNamePrefix "$oDir${filename%.*}" --runThreadN 16
 		#bwa mem $2 filename | samtools view -bS > ${filename}.bam
 	done
 
@@ -120,6 +133,7 @@ then
 	#maybe a custom tool for this part based on what dr. sun wants
 
 	#quantifying gene expression
+	cd ${oDir%/}
 
 	for filename in $fqDir/*fq
 	do
@@ -129,7 +143,8 @@ then
 	do
 		rsem-calculate-expression --bam "${filename%.*}Aligned.toTranscriptome.out.bam" --num-threads 16
 	done
-
+	
+	cd ../
 	#at this point we will have gene.results files?? and they can be used in the R language with Deseq2
 fi
 
