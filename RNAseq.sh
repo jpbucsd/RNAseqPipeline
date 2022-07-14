@@ -115,6 +115,9 @@ then
 	done
 	
 	mkdir ${oDir%/}
+	chmod -R 0777 ${oDir%/}
+	mkdir "${oDir%/}/$fqDir"
+	chmod -R 0777 "${oDir%/}/$fqDir"
 
 	for filename in $fqDir/*.fq 
 	do
@@ -134,6 +137,7 @@ then
 
 	#quantifying gene expression
 	cd ${oDir%/}
+	
 
 	for filename in $fqDir/*fq
 	do
