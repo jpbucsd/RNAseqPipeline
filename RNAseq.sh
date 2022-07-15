@@ -91,7 +91,7 @@ then
 	#star requires 36GB of ram and 12 threads
 	STAR --runMode genomeGenerate --genomeFastaFiles GCF_000001405.40_GRCh38.p14_genomic.fna --sjdbGTFfile GCF_000001405.40_GRCh38.p14_genomic.gtf --genomeDir genome --genomeChrBinNbits $factor --runThreadN 16
 	
-	rsem-prepare-reference --runThreadN 16 GCF_000001405.40_GRCh38.p14_genomic.fna reference
+	rsem-prepare-reference --gtf GCF_000001405.40_GRCh38.p14_genomic.gtf --runThreadN 16 GCF_000001405.40_GRCh38.p14_genomic.fna reference
 		
 	#leave refGen to return to normal
 	cd ../
