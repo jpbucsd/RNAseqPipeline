@@ -142,15 +142,10 @@ then
 	cd ${oDir%/}
 	
 
-	for filename in $fqDir/*fq
+	for filename in $fqDir/*.out.sam
 	do
-		echo "calculating expression of ${filename%.*}Aligned.toTranscriptome.out.bam"
-		rsem-calculate-expression --bam "${filename%.*}Aligned.toTranscriptome.out.bam" --num-threads 16
-	done
-	for filename in $fqDir/*fastq
-	do
-		echo "calculating expression of ${filename%.*}Aligned.toTranscriptome.out.bam"
-		rsem-calculate-expression --bam "${filename%.*}Aligned.toTranscriptome.out.bam" --num-threads 16
+		echo "calculating expression of ${filename}"
+		rsem-calculate-expression --sam "${filename}" --num-threads 16
 	done
 	
 	cd ../
