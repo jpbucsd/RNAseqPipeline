@@ -75,11 +75,9 @@ if [[ $align != 0 ]]
 then
 	for filename in $oDir$fqDir/*.out.sam
 	do
-		echo "converting $filename to "${filename%.*}.bam""
-		samtools view --threads 16 -S -b $filename > "${filename%.*}.bam"
 		echo "calculating expression of ${filename}
 		sample_fname="${filename##*/}"
 		sample_name="${sample_fname%.*}"
-		rsem-calculate-expression --num-threads 16 --bam "${filename%.*}.bam" refGen/genome "${sample_name}"
+		rsem-calculate-expression --num-threads 16 --bam "${filename%.*}.bam" refGen/GCF_000001405.40_GRCh38.p14_genomic "${sample_name}"
 	done
 fi
