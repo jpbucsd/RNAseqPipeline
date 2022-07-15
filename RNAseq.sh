@@ -103,15 +103,16 @@ fi
 
 if [[ $align != 0 ]]
 then
-	echo "aligning"
 	for filename in $fqDir/*.fq.gz 
 	do
-		tar xzvf ${filename}
+		echo "unzipping $filename"
+		gzip -d ${filename}
 	done
 
 	for filename in $fqDir/*fastq.gz 
 	do
-		tar xzvf ${filename}
+		echo "unzipping $filename"
+		gzip -d ${filename}
 	done
 	
 	mkdir ${oDir%/}
@@ -121,6 +122,7 @@ then
 
 	for filename in $fqDir/*.fq 
 	do
+		echo "aligning $filename"
 		#the following line is the originally intended bwa command with $2 being an index genome in fna format or something.
 		#bwa mem $2 filename | samtools view -bS > ${filename}.bam
 		STAR --genomeDir refGen/genome --readFilesIn ${filename} --outFileNamePrefix "$oDir${filename%.*}" --runThreadN 16
@@ -128,6 +130,7 @@ then
 	
 	for filename in $fqDir/*.fastq 
 	do
+		echo "aligning $filename"
 		STAR --genomeDir refGen/genome --readFilesIn ${filename} --outFileNamePrefix "$oDir${filename%.*}" --runThreadN 16
 		#bwa mem $2 filename | samtools view -bS > ${filename}.bam
 	done
@@ -141,10 +144,12 @@ then
 
 	for filename in $fqDir/*fq
 	do
+		echo "calculating expression of ${filename%.*}Aligned.toTranscriptome.out.bam"
 		rsem-calculate-expression --bam "${filename%.*}Aligned.toTranscriptome.out.bam" --num-threads 16
 	done
 	for filename in $fqDir/*fastq
 	do
+		echo "calculating expression of ${filename%.*}Aligned.toTranscriptome.out.bam"
 		rsem-calculate-expression --bam "${filename%.*}Aligned.toTranscriptome.out.bam" --num-threads 16
 	done
 	
