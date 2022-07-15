@@ -146,10 +146,11 @@ then
 
 	for filename in $oDir/$fqDir/*.out.sam
 	do
+		samtools view -S -b $filename > "${filename%.*}.bam"
 		echo "calculating expression of ${filename}"
 		sample_fname="${filename##*/}"
 		sample_name="${sample_fname%.*}"
-		rsem-calculate-expression --num-threads 16 "${filename}" refGen/reference "${sample_name}"
+		rsem-calculate-expression --star --num-threads 16 --alignments "${filename%.*}.bam" refGen/genome "${sample_name}"
 	done
 	
 	#cd ../
