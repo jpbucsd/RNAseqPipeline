@@ -76,7 +76,7 @@ then
 	for filename in $oDir$fqDir/*.out.sam
 	do
 		echo "converting $filename to "${filename%.*}.bam""
-		samtools view -S -b $filename > "${filename%.*}.bam"
+		samtools view --threads 16 -S -b $filename > "${filename%.*}.bam"
 		echo "calculating expression of ${filename}"
 		sample_fname="${filename##*/}"
 		sample_name="${sample_fname%.*}"
