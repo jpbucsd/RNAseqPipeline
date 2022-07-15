@@ -64,7 +64,8 @@ done
 if [[ $indexF == 1 ]]
 then
 	cd refGen
-	rsem-prepare-reference --gtf GCF_000001405.40_GRCh38.p14_genomic.gtf --num-threads 16 GCF_000001405.40_GRCh38.p14_genomic.fna reference
+	#i think this indexing (bowtie2) is an alterative to star and it will not be used for this pipeline
+	rsem-prepare-reference --gtf GCF_000001405.40_GRCh38.p14_genomic.gtf --num-threads 16 --bowtie2 GCF_000001405.40_GRCh38.p14_genomic.fna GCF_000001405.40_GRCh38.p14_genomic
 	#leave refGen to return to normal
 	cd ../
 	
@@ -74,9 +75,10 @@ if [[ $align != 0 ]]
 then
 	for filename in $oDir/$fqDir/*.out.sam
 	do
+		samtools view -S -b $filename > "${filename%.*}.bam"
 		echo "calculating expression of ${filename}"
 		sample_fname="${filename##*/}"
 		sample_name="${sample_fname%.*}"
-		rsem-calculate-expression --num-threads 16 "${filename}" refGen/reference "${sample_name}"
+		rsem-calculate-expression --star --num-threads 16 --alignments "${filename%.*}.bam" refGen/genome "${sample_name}"
 	done
 fi
