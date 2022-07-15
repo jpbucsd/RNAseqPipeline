@@ -64,7 +64,7 @@ done
 if [[ $indexF == 1 ]]
 then
 	cd refGen
-	rsem-prepare-reference --gtf GCF_000001405.40_GRCh38.p14_genomic.gtf --runThreadN 16 GCF_000001405.40_GRCh38.p14_genomic.fna reference
+	rsem-prepare-reference --gtf GCF_000001405.40_GRCh38.p14_genomic.gtf --num-threads 16 GCF_000001405.40_GRCh38.p14_genomic.fna reference
 	#leave refGen to return to normal
 	cd ../
 	
