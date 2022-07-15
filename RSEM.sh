@@ -77,9 +77,9 @@ then
 	do
 		echo "converting $filename to "${filename%.*}.bam""
 		samtools view --threads 16 -S -b $filename > "${filename%.*}.bam"
-		echo "calculating expression of ${filename}"
+		echo "calculating expression of ${filename}
 		sample_fname="${filename##*/}"
 		sample_name="${sample_fname%.*}"
-		rsem-calculate-expression --star --num-threads 16 --alignments "${filename%.*}.bam" refGen/genome "${sample_name}"
+		rsem-calculate-expression --num-threads 16 --bam "${filename%.*}.bam" refGen/genome "${sample_name}"
 	done
 fi
