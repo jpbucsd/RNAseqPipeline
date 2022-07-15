@@ -109,7 +109,7 @@ then
 		gzip -d ${filename}
 	done
 
-	for filename in $fqDir/*fastq.gz 
+	for filename in $fqDir/*.fastq.gz 
 	do
 		echo "unzipping $filename"
 		gzip -d ${filename}
