@@ -90,10 +90,12 @@ then
 	chmod -R 0777 genome
 	#star requires 36GB of ram and 12 threads
 	STAR --runMode genomeGenerate --genomeFastaFiles GCF_000001405.40_GRCh38.p14_genomic.fna --sjdbGTFfile GCF_000001405.40_GRCh38.p14_genomic.gtf --genomeDir genome --genomeChrBinNbits $factor --runThreadN 16
-
+	
+	rsem-prepare-reference --runThreadN 16 GCF_000001405.40_GRCh38.p14_genomic.fna reference
 		
 	#leave refGen to return to normal
 	cd ../
+	
 fi
 
 #at this point it is assumed that there is a folder containing indexed information at refGen/genome/
@@ -139,16 +141,18 @@ then
 	#maybe a custom tool for this part based on what dr. sun wants
 
 	#quantifying gene expression
-	cd ${oDir%/}
+	#cd ${oDir%/}
 	
 
-	for filename in $fqDir/*.out.sam
+	for filename in $oDir/$fqDir/*.out.sam
 	do
 		echo "calculating expression of ${filename}"
-		rsem-calculate-expression --sam "${filename}" --num-threads 16
+		sample_fname="${filename##*/}"
+		sample_name="${sample_fname%.*}"
+		rsem-calculate-expression --num-threads 16 "${filename}" refGen/reference "${sample_name}"
 	done
 	
-	cd ../
+	#cd ../
 	#at this point we will have gene.results files?? and they can be used in the R language with Deseq2
 fi
 
