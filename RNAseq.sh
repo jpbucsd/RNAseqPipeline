@@ -91,10 +91,10 @@ then
 	#star requires 36GB of ram and 12 threads
 	STAR --runMode genomeGenerate --genomeFastaFiles GCF_000001405.40_GRCh38.p14_genomic.fna --sjdbGTFfile GCF_000001405.40_GRCh38.p14_genomic.gtf --genomeDir genome --genomeChrBinNbits $factor --runThreadN 16
 	
-	#rsem indexing with bowtie3 will not be performed
-	#rsem-prepare-reference --gtf GCF_000001405.40_GRCh38.p14_genomic.gtf --num-threads 16 --bowtie2 GCF_000001405.40_GRCh38.p14_genomic.fna GCF_000001405.40_GRCh38.p14_genomic
-	#the preceeding command could be used to do this however, the rsem-calculate-expression command will have to beupdated as well to remove --star and take this reference.	
-	
+	#we must produce an RSEM index to use RSEM for quantitative analysis later. This step runs extremely quickly compared to STAR's indexing, and finishes easily on a regular computer
+	cp GCF_000001405.40_GRCh38.p14_genomic.fna GCF_000001405.40_GRCh38.p14_genomic.fa
+	rsem-prepare-reference --gtf GCF_000001405.40_GRCh38.p14_genomic.gtf --num-threads 16 GCF_000001405.40_GRCh38.p14_genomic.fa GCF_000001405.40_GRCh38.p14_genomic
+
 	#leave refGen to return to normal
 	cd ../
 	
@@ -153,7 +153,7 @@ then
 		echo "calculating expression of ${filename}"
 		sample_fname="${filename##*/}"
 		sample_name="${sample_fname%.*}"
-		rsem-calculate-expression --star --num-threads 16 --alignments "${filename%.*}.bam" refGen/genome/SAindex "${sample_name}"
+		rsem-calculate-expression --star --num-threads 16 --alignments "${filename%.*}.bam" refGen/GCF_000001405.40_GRCh38.p14_genomic "${sample_name}"
 	done
 	
 	#cd ../
