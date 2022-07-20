@@ -75,7 +75,7 @@ if [[ $align != 0 ]]
 then
 	for filename in $oDir$fqDir/*.out.sam
 	do
-		echo "calculating expression of ${filename}
+		echo "calculating expression of ${filename}"
 		sample_fname="${filename##*/}"
 		sample_name="${sample_fname%.*}"
 		#rsem-calculate-expression --num-threads 16 --bam "${filename%.*}.bam" refGen/GCF_000001405.40_GRCh38.p14_genomic "${sample_name}"
