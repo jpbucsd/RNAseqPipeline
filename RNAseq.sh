@@ -127,20 +127,14 @@ then
 	for filename in $fqDir/*.fq 
 	do
 		echo "aligning $filename"
-		#the following line is the originally intended bwa command with $2 being an index genome in fna format or something.
-		#bwa mem $2 filename | samtools view -bS > ${filename}.bam
-		STAR --genomeDir refGen/genome --readFilesIn ${filename} --outFileNamePrefix "$oDir${filename%.*}" --runThreadN 16
+		STAR --genomeDir refGen/genome --readFilesIn ${filename} --outFileNamePrefix "$oDir${filename%.*}" --runThreadN 16 --quantMode TranscriptomeSAM
 	done
 	
 	for filename in $fqDir/*.fastq 
 	do
 		echo "aligning $filename"
 		STAR --genomeDir refGen/genome --readFilesIn ${filename} --outFileNamePrefix "$oDir${filename%.*}" --runThreadN 16 --quantMode TranscriptomeSAM
-		#bwa mem $2 filename | samtools view -bS > ${filename}.bam
 	done
-
-	#the next step will be to use the tool rsem, which will output a customized txt file containing the expression of each gene
-	#maybe a custom tool for this part based on what dr. sun wants
 
 	#quantifying gene expression
 	#cd ${oDir%/}
