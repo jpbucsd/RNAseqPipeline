@@ -144,11 +144,14 @@ then
 	do
 		echo "converting $filename to "${filename%.*}.bam""
 		samtools view --threads 16 -S -b $filename > "${filename%.*}.bam"
+	done
+	
+	for filename in $oDir$fqDir/*.out.bam
+	do
 		echo "calculating expression of ${filename}"
 		sample_fname="${filename##*/}"
 		sample_name="${sample_fname%.*}"
 		rsem-calculate-expression --num-threads 16 --alignments "${filename%.*}.bam" refGen/GCF_000001405.40_GRCh38.p14_genomic "${sample_name}"
-		
 	done
 	
 	#cd ../
