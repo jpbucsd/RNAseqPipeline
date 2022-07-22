@@ -124,7 +124,7 @@ then
 		echo "genome for length $readLength has not been indexed, moving to indexing"
 		indexF=1
 	fi
-
+fi
 if [[ $indexF == 1 ]]
 then
 	echo "indexing"
