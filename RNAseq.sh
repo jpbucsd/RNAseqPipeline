@@ -88,9 +88,9 @@ do
 			paired=1
 		fi
 	elif [[ $pFlag == 1 ]]
+	then
 		pFlag=2
 		pair1="$var"
-	then
 	elif [[ $pFlag == 2 ]]
 		pFlag=0
 		pair2="$var"
