@@ -185,13 +185,6 @@ fi
 #the next step in the RNA-seq pipeline is alignment of .fq to the reference genome
 #because the previous step was performed in STAR, in order to get BAM files this too must be performed with STAR.
 
-my_array[0]=foo
-my_array[1]=yobo
-for i in "${!my_array[@]}"
-do 
-    echo "${my_array[$i]}"
-done
-
 samples[0]=""
 
 if [[ paired == 1 ]]
@@ -201,12 +194,18 @@ then
 		mv $filename ${filename%.fastq.gz}.fq.gz
 	done
 	
-	for filename in $fqDir/*_1.fq.gz
+	for filename in $fqDir/*.fq.gz
+	do
+		echo "unzipping $filename"
+		gzip -d $filename
+	done
+	
+	for filename in $fqDir/*_1.fq
 	do
 		it=0
-		if [ -f "${filename%_1.fq.gz}_2.fq.gz" ]
+		if [ -f "${filename%_1.fq.gz}_2.fq" ]
 		then
-			samples[$it]="${filename%_1.fq.gz}"
+			samples[$it]="${filename%_1.fq}"
 			it=$(expr $it + 1)
 		else
 			"ERROR: no matching pair for $filename ; will not be included"
@@ -222,12 +221,9 @@ then
 		for i in "${!samples[@]}"
 		do 
 		   	base="${samples[$i]}"
-		    	read1=$fqDir/${samples[$i]}_1.fq.gz
-			read2=$fqDir/${samples[$i]}_2.fq.gz
-		        echo "unzipping $read1"
-			gzip -d ${read1}
-			echo "unzipping $read2"
-			gzip -d ${read2}
+		    	read1=$fqDir/${samples[$i]}_1.fq
+			read2=$fqDir/${samples[$i]}_2.fq
+		        
 
 			echo "aligning $base"
 
@@ -244,7 +240,7 @@ then
 			    	--sjdbScore 1 \
 			    	--limitBAMsortRAM 50000000000"
 
-			 STAR --genomeDir refGen/genome$readLength --readFilesIn ${read1%.gz} ${read2%.gz} --outFileNamePrefix "$oDir${base}" --runThreadN 16 --quantMode TranscriptomeSAM ${STAROPTS}
+			 STAR --genomeDir refGen/genome$readLength --readFilesIn ${read1} ${read2} --outFileNamePrefix "$oDir${base}" --runThreadN 16 --quantMode TranscriptomeSAM ${STAROPTS}
 
 			 echo "calculating expression of ${base}"
 			 rsem-calculate-expression --num-threads 16 --paired-end --alignments "${oDir}${base}Aligned.toTranscriptome.out.bam" refGen/GCF_000001405.40_GRCh38.p14_genomic "${base}"
