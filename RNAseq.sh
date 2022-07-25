@@ -163,7 +163,7 @@ then
 	factor=$(printf "%.0f\n" $logV)
 	#factor=22
 	
-	overhang = $(expr $readLength - 1 )
+	overhang=$(expr $readLength - 1 )
 	
 		
 	mkdir "genome${readLength}"
