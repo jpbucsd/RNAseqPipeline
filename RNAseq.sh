@@ -19,12 +19,12 @@ pair2="_2"
 #usage of command line arguments
 #-h - help //todo
 #-f fastqdirectory
-#-o output directory for alignment
+#-o output directory
 
 #-r readLength
 #-p signals paired ends (should have the same name and end in _1 and _2, otherwise type what files will end in)
 
-#-index (compute index) usage of index with no other arguments will cause only indexing to occur. without this flag indexing will not occur
+#-index (compute index) usage of index with no other arguments will cause only indexing to occur. without this flag indexing will not occur //depricated
 
 #input command line arguments
 for var in "$@"
@@ -52,18 +52,18 @@ do
 		then
 			pFlag=0
 		fi
-		if [[ "$var" == *"-i"* ]]
-		then
+		#if [[ "$var" == *"-i"* ]]
+		#then
 			#calculate index!
-			indexF=1
-			if [[ "$align" == 1 ]]
-			then
-				#it is assumed we want to align, unless index is called. if index is called then we will set align to 0 
-				#if align is 2, it means there have already been parameters for alignment
-				align=0
-				quantify=0
-			fi
-		fi
+			#indexF=1
+			#if [[ "$align" == 1 ]]
+			#then
+			#	#it is assumed we want to align, unless index is called. if index is called then we will set align to 0 
+			#	#if align is 2, it means there have already been parameters for alignment
+			#	align=0
+			#	quantify=0
+			#fi
+		#fi
 		if [[ "$var" == *"-f"* ]]
 		then
 			#fast q files coming up
@@ -143,7 +143,7 @@ if [[ $tempBool == 0 ]]
 then
 	#must index
 	echo "genome for length $readLength has not been indexed with STAR, moving to indexing"
-	indexF=1
+	#indexF=1
 	
 	
 	
@@ -196,18 +196,19 @@ samples[0]=""
 
 if [[ paired == 1 ]]
 then
-	for filename in $fqDir/*.fastq.gz
+	cd $fqDir
+	for filename in *.fastq.gz
 	do
 		mv $filename ${filename%.fastq.gz}.fq.gz
 	done
 	
-	for filename in $fqDir/*.fq.gz
+	for filename in *.fq.gz
 	do
 		echo "unzipping $filename"
 		gzip -d $filename
 	done
 	
-	for filename in $fqDir/*_1.fq
+	for filename in *_1.fq
 	do
 		it=0
 		if [ -f "${filename%_1.fq.gz}_2.fq" ]
@@ -220,16 +221,16 @@ then
 	done
 	mkdir ${oDir%/}
 	chmod -R 0777 ${oDir%/}
-	mkdir "${oDir%/}/$fqDir"
-	chmod -R 0777 "${oDir%/}/$fqDir"
+	mkdir "${oDir%/}/Alignment"
+	chmod -R 0777 "${oDir%/}/Alignment"
 		
 	if [[ $align != 0 ]]
 	then
 		for i in "${!samples[@]}"
 		do 
 		   	base="${samples[$i]}"
-		    	read1=$fqDir/${samples[$i]}_1.fq
-			read2=$fqDir/${samples[$i]}_2.fq
+		    	read1=${samples[$i]}_1.fq
+			read2=${samples[$i]}_2.fq
 		        
 
 			echo "aligning $base"
@@ -247,12 +248,14 @@ then
 			    	--sjdbScore 1 \
 			    	--limitBAMsortRAM 50000000000"
 
-			 STAR --genomeDir refGen/genome$readLength --readFilesIn ${read1} ${read2} --outFileNamePrefix "$oDir${base}" --runThreadN 16 --quantMode TranscriptomeSAM ${STAROPTS}
+			 STAR --genomeDir refGen/genome$readLength --readFilesIn ${read1} ${read2} --outFileNamePrefix "${oDir}Alignment/${base}" --runThreadN 16 --quantMode TranscriptomeSAM ${STAROPTS}
 
 			 echo "calculating expression of ${base}"
-			 rsem-calculate-expression --num-threads 16 --paired-end --alignments "${oDir}${base}Aligned.toTranscriptome.out.bam" refGen/GCF_000001405.40_GRCh38.p14_genomic "${base}"
+			 rsem-calculate-expression --num-threads 16 --paired-end --alignments "${oDir}Alignment/${base}Aligned.toTranscriptome.out.bam" refGen/GCF_000001405.40_GRCh38.p14_genomic "${base}"
 		done
 	fi
+	#leave the raw read directory, where all alignments and quantifications have now been saved to
+	cd ../
 else
 	#unpaired pipeline
 	if [[ $align != 0 ]]
