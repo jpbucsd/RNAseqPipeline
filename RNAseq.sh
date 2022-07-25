@@ -129,27 +129,22 @@ if [[ $indexF == 1 ]]
 then
 	echo "indexing"
 	
-	if [ -d refGen ]
+	if ! [ -d refGen ]
 	then
-	else
 		mkdir refGen
 	fi
 	cd refGen
-	if [ -f GCF_000001405.40_GRCh38.p14_genomic.fna ]
+	if ! [ -f GCF_000001405.40_GRCh38.p14_genomic.fna ]
 	then
-	else
-		if [ -f GCF_000001405.40_GRCh38.p14_genomic.fna.gz ]
-		then
+		if ! [ -f GCF_000001405.40_GRCh38.p14_genomic.fna.gz ]
 		else
 			wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_genomic.fna.gz
 		fi
 		gzip -d GCF_000001405.40_GRCh38.p14_genomic.fna.gz
 	fi
-	if [ -f GCF_000001405.40_GRCh38.p14_genomic.gtf ]
-	then
+	if ! [ -f GCF_000001405.40_GRCh38.p14_genomic.gtf ]
 	else
-		if [ -f GCF_000001405.40_GRCh38.p14_genomic.gtf.gz ]
-		then
+		if ! [ -f GCF_000001405.40_GRCh38.p14_genomic.gtf.gz ]
 		else
 			wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_genomic.gtf.gz
 		fi
