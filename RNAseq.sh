@@ -92,9 +92,9 @@ do
 		pFlag=2
 		pair1="$var"
 	elif [[ $pFlag == 2 ]]
+	then
 		pFlag=0
 		pair2="$var"
-	then
 	else
 		#default choice to assume fqdir if fqdir is empty
 		if [[ "$fqDir" == "" ]]
