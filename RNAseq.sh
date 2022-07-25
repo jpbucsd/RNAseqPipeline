@@ -110,46 +110,40 @@ done
 #this script will only execute if the instruction to generate an index is included.
 
 #check if genome has been indexed for the proper settings
-if [[ $indexF == 0 ]]
+
+if ! [ -d refGen ]
 then
-	tempBool=0
-	if [ -d "refGen/genome$readLength" ] 
-	then
-		echo "genome for length $readLength has already been indexed, moving to alignment"
-    		tempBool=1
-	fi
-	if [[ $tempBool == 0 ]]
-	then
-		#must index
-		echo "genome for length $readLength has not been indexed, moving to indexing"
-		indexF=1
-	fi
+	mkdir refGen
 fi
-if [[ $indexF == 1 ]]
+cd refGen
+if ! [ -f GCF_000001405.40_GRCh38.p14_genomic.fna ]
 then
-	echo "indexing"
-	
-	if ! [ -d refGen ]
+	if ! [ -f GCF_000001405.40_GRCh38.p14_genomic.fna.gz ]
 	then
-		mkdir refGen
+		wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_genomic.fna.gz
 	fi
-	cd refGen
-	if ! [ -f GCF_000001405.40_GRCh38.p14_genomic.fna ]
+	gzip -d GCF_000001405.40_GRCh38.p14_genomic.fna.gz
+fi
+if ! [ -f GCF_000001405.40_GRCh38.p14_genomic.gtf ]
+then
+	if ! [ -f GCF_000001405.40_GRCh38.p14_genomic.gtf.gz ]
 	then
-		if ! [ -f GCF_000001405.40_GRCh38.p14_genomic.fna.gz ]
-		then
-			wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_genomic.fna.gz
-		fi
-		gzip -d GCF_000001405.40_GRCh38.p14_genomic.fna.gz
+		wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_genomic.gtf.gz
 	fi
-	if ! [ -f GCF_000001405.40_GRCh38.p14_genomic.gtf ]
-	then
-		if ! [ -f GCF_000001405.40_GRCh38.p14_genomic.gtf.gz ]
-		then
-			wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_genomic.gtf.gz
-		fi
-		gzip -d GCF_000001405.40_GRCh38.p14_genomic.gtf.gz
-	fi
+	gzip -d GCF_000001405.40_GRCh38.p14_genomic.gtf.gz
+fi
+
+tempBool=0
+if [ -d "refGen/genome$readLength" ] 
+then
+	echo "genome for length $readLength has already been indexed with STAR"
+    	tempBool=1
+fi
+if [[ $tempBool == 0 ]]
+then
+	#must index
+	echo "genome for length $readLength has not been indexed with STAR, moving to indexing"
+	indexF=1
 	
 	
 	
@@ -171,14 +165,27 @@ then
 	#star requires 36GB of ram and 12 threads
 	STAR --runMode genomeGenerate --genomeFastaFiles GCF_000001405.40_GRCh38.p14_genomic.fna --sjdbGTFfile GCF_000001405.40_GRCh38.p14_genomic.gtf --genomeDir "genome${readLength}" --genomeChrBinNbits $factor --runThreadN 16 --sjdbOverhang $overhang
 	
-	#we must produce an RSEM index to use RSEM for quantitative analysis later. This step runs extremely quickly compared to STAR's indexing, and finishes easily on a regular computer
-	cp GCF_000001405.40_GRCh38.p14_genomic.fna GCF_000001405.40_GRCh38.p14_genomic.fa
-	rsem-prepare-reference --gtf GCF_000001405.40_GRCh38.p14_genomic.gtf --num-threads 16 GCF_000001405.40_GRCh38.p14_genomic.fa GCF_000001405.40_GRCh38.p14_genomic
-
-	#leave refGen to return to normal
-	cd ../
-	
 fi
+tempbool=0
+if [ -f "refGen/*n2g.idx.fa" ] 
+then
+	echo "genome has already been indexed with RSEM"
+    	tempBool=1
+fi
+if [[ $tempBool == 0 ]]
+then
+	#we must produce an RSEM index to use RSEM for quantitative analysis later. This step runs extremely quickly compared to STAR's indexing, and finishes easily on a regular computer
+	echo "genome has not yet been indexed with RSEM, indexing..."
+	
+	if ! [ -f GCF_000001405.40_GRCh38.p14_genomic.fa ]
+	then
+		cp GCF_000001405.40_GRCh38.p14_genomic.fna GCF_000001405.40_GRCh38.p14_genomic.fa
+	fi
+	rsem-prepare-reference --gtf GCF_000001405.40_GRCh38.p14_genomic.gtf --num-threads 16 GCF_000001405.40_GRCh38.p14_genomic.fa GCF_000001405.40_GRCh38.p14_genomic
+fi
+
+#leave refGen and return to normal
+cd ../
 
 #at this point it is assumed that there is a folder containing indexed information at refGen/genome/
 
