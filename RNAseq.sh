@@ -133,14 +133,10 @@ then
 	gzip -d GCF_000001405.40_GRCh38.p14_genomic.gtf.gz
 fi
 
-tempBool=0
 if [ -d "refGen/genome$readLength" ] 
 then
 	echo "genome for length $readLength has already been indexed with STAR"
-    	tempBool=1
-fi
-if [[ $tempBool == 0 ]]
-then
+else
 	#must index
 	echo "genome for length $readLength has not been indexed with STAR, moving to indexing"
 	#indexF=1
@@ -166,14 +162,11 @@ then
 	STAR --runMode genomeGenerate --genomeFastaFiles GCF_000001405.40_GRCh38.p14_genomic.fna --sjdbGTFfile GCF_000001405.40_GRCh38.p14_genomic.gtf --genomeDir "genome${readLength}" --genomeChrBinNbits $factor --runThreadN 16 --sjdbOverhang $overhang
 	
 fi
-tempbool=0
-if [ -f "refGen/*n2g.idx.fa" ] 
+
+if [ -f refGen/*.n2g.idx.fa ] 
 then
 	echo "genome has already been indexed with RSEM"
-    	tempBool=1
-fi
-if [[ $tempBool == 0 ]]
-then
+else
 	#we must produce an RSEM index to use RSEM for quantitative analysis later. This step runs extremely quickly compared to STAR's indexing, and finishes easily on a regular computer
 	echo "genome has not yet been indexed with RSEM, indexing..."
 	
