@@ -15,6 +15,7 @@ pFlag=0
 paired=0
 pair1="_1"
 pair2="_2"
+rsd=$(pwd) #directory where RNA seq commands are stored, may not be root of fastq reads
 
 #usage of command line arguments
 #-h - help //todo
@@ -248,7 +249,8 @@ then
 		done
 	fi
 	#leave the raw read directory, where all alignments and quantifications have now been saved to
-	cd ../
+	#cd ../
+	cd $rsd
 else
 	#unpaired pipeline
 	if [[ $align != 0 ]]
