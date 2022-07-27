@@ -134,7 +134,7 @@ then
 	gzip -d GCF_000001405.40_GRCh38.p14_genomic.gtf.gz
 fi
 
-if [ -d "refGen/genome$readLength" ] 
+if [ -d "genome$readLength" ] 
 then
 	echo "genome for length $readLength has already been indexed with STAR"
 else
@@ -164,7 +164,7 @@ else
 	
 fi
 
-if [ -f refGen/*.n2g.idx.fa ] 
+if [ -f *.n2g.idx.fa ] 
 then
 	echo "genome has already been indexed with RSEM"
 else
@@ -188,7 +188,7 @@ cd ../
 
 samples[0]=""
 
-if [[ paired == 1 ]]
+if [[ $paired == 1 ]]
 then
 	cd $fqDir
 	for filename in *.fastq.gz
