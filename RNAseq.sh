@@ -201,13 +201,12 @@ then
 		echo "unzipping $filename"
 		gzip -d $filename
 	done
-	
-	for filename in *_1.fq
+	it=0
+	for filename in *${pair1}.fq
 	do
-		it=0
-		if [ -f "${filename%_1.fq.gz}_2.fq" ]
+		if [ -f "${filename%${pair1}.fq}${pair2}.fq" ]
 		then
-			samples[$it]="${filename%_1.fq}"
+			samples[$it]="${filename%${pair1}.fq}"
 			it=$(expr $it + 1)
 		else
 			"ERROR: no matching pair for $filename ; will not be included"
@@ -223,8 +222,8 @@ then
 		for i in "${!samples[@]}"
 		do 
 		   	base="${samples[$i]}"
-		    	read1=${samples[$i]}_1.fq
-			read2=${samples[$i]}_2.fq
+		    	read1=${samples[$i]}${pair1}.fq
+			read2=${samples[$i]}${pair2}.fq
 		        
 
 			echo "aligning $base"
