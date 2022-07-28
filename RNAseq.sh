@@ -241,10 +241,10 @@ then
 			    	--sjdbScore 1 \
 			    	--limitBAMsortRAM 50000000000"
 
-			 STAR --genomeDir refGen/genome$readLength --readFilesIn ${read1} ${read2} --outFileNamePrefix "${oDir}Alignment/${base}" --runThreadN 16 --quantMode TranscriptomeSAM ${STAROPTS}
+			 STAR --genomeDir ${rsd}/refGen/genome$readLength --readFilesIn ${read1} ${read2} --outFileNamePrefix "${oDir}Alignment/${base}" --runThreadN 16 --quantMode TranscriptomeSAM ${STAROPTS}
 
 			 echo "calculating expression of ${base}"
-			 rsem-calculate-expression --num-threads 16 --paired-end --alignments "${oDir}Alignment/${base}Aligned.toTranscriptome.out.bam" refGen/GCF_000001405.40_GRCh38.p14_genomic "${base}"
+			 rsem-calculate-expression --num-threads 16 --paired-end --alignments "${oDir}Alignment/${base}Aligned.toTranscriptome.out.bam" ${rsd}/refGen/GCF_000001405.40_GRCh38.p14_genomic "${oDir}${base}"
 		done
 	fi
 	#leave the raw read directory, where all alignments and quantifications have now been saved to
