@@ -5,7 +5,7 @@ library("tximport")
 #command line usage 1:
 #Rscript Rtest.R -1 firstSet set1file1.genes.results set1file2.genes.results ... set1fileN.genes.results -2 secondSet set2file1.genes.results set2file2.genes.results ... set2fileN.genes.results
 #command line usage 2:
-Rscript Rtest.R -1 set1file1.genes.results set1file2.genes.results ... set1fileN.genes.results -2 set2file1.genes.results set2file2.genes.results ... set2fileN.genes.results
+#Rscript Rtest.R -1 set1file1.genes.results set1file2.genes.results ... set1fileN.genes.results -2 set2file1.genes.results set2file2.genes.results ... set2fileN.genes.results
 
 args <- commandArgs(trailingOnly = TRUE)
 first <- FALSE
