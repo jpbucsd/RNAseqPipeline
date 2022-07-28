@@ -305,9 +305,4 @@ else
 		#cd ../
 		#at this point we will have gene.results files?? and they can be used in the R language with Deseq2
 	fi
-
-	if [[ $quantify != 0 ]]
-	then
-
-	fi
 fi
