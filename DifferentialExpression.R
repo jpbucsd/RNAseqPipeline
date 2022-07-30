@@ -116,5 +116,6 @@ ddsTxi <- ddsTxi[keep,]
 
 #write results
 ofnname <- paste(firstName,secondName,sep="_vs_")
+ofname <- paste(dirName,ofnname,sep="/")
 write.csv(as.data.frame(res), file=ofname)
                 
