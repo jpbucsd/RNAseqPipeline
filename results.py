@@ -43,27 +43,27 @@ for arg in sys.argv:
           logFlag=False
           llogFlag=False
           outFlag=False
-       elif arg[2] == 'L':
+      elif arg[2] == 'L':
           #log10 selected
           fileFlag=True
           padFlag=False
           logFlag=False
           llogFlag=True
           outFlag=False
-       elif arg[2] == "o":
+      elif arg[2] == "o":
           #odir sleected
           fileFlag=True
           padFlag=False
           logFlag=False
           llogFlag=False
           outFlag=True
-     elif arg[1] == 'f':
-       #files selected
-       fileFlag=True
-       padFlag=False
-       logFlag=False
-       llogFlag=False
-       outFlag=False
+    elif arg[1] == 'f':
+      #files selected
+      fileFlag=True
+      padFlag=False
+      logFlag=False
+      llogFlag=False
+      outFlag=False
   elif fileFlag:
     files.append(arg)
   elif padFlag:
