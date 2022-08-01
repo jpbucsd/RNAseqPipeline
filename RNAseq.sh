@@ -18,7 +18,6 @@ pair2="_2"
 slr=""
 sFlag=0
 analysis=0
-aFlag=0
 
 
 rsd=$(pwd) #directory where RNA seq commands are stored, may not be root of fastq reads
@@ -40,7 +39,6 @@ do
 	then
 		fqFlag=0
 		fqDir="$var"
-		align=2
 		quantify=2
 		#next check for other flags before -
 	elif [[ $oFlag == 1 ]]
@@ -55,14 +53,6 @@ do
 	then
 		sFlag=0
 		slr=$var
-	elif [[ $aFlag == 1 ]]
-	then
-		aFlag=0
-		analysis=1
-		if [[ $align == 1 ]]
-		then
-			align=0
-		fi
 	elif [[ "$var" == "-"* ]]
 	then
 		#some flags may have multiple phrases following them so the -option comes first in the else ifs. 
@@ -71,27 +61,10 @@ do
 		then
 			pFlag=0
 		fi
-		#if [[ "$var" == *"-i"* ]]
-		#then
-			#calculate index!
-			#indexF=1
-			#if [[ "$align" == 1 ]]
-			#then
-			#	#it is assumed we want to align, unless index is called. if index is called then we will set align to 0 
-			#	#if align is 2, it means there have already been parameters for alignment
-			#	align=0
-			#	quantify=0
-			#fi
-		#fi
 		if [[ "$var" == *"-f"* ]]
 		then
 			#fast q files coming up
 			fqFlag=1
-			align=2
-		fi
-		if [[ "$var" == *"-o"* ]]
-		then
-			oFlag=1
 		fi
 		if [[ "$var" == *"-o"* ]]
 		then
@@ -110,9 +83,13 @@ do
 		then
 			sFlag=1
 		fi
-		if [[ "$var" == *"-d"* ]]
+		if [[ "$var" == "-"*"d"* ]]
 		then
-			aFlag=1
+			analysis=1
+		fi
+		if [[ "$var" == "-"*"a"* ]]
+		then
+			align=2
 		fi
 	elif [[ $pFlag == 1 ]]
 	then
@@ -127,7 +104,6 @@ do
 		if [[ "$fqDir" == "" ]]
 		then
 			fqDir="$var"
-			align=2
 		fi
 	fi
 done
@@ -334,7 +310,7 @@ then
 		fi
 	fi
 fi
-if [[ analysis != 0 ]]
+if [[ $analysis != 0 ]]
 then
 	factors[0]=""
 	cat $slr | grep -n "Attributes:" > tempFile.slr
