@@ -319,7 +319,7 @@ then
 		it=0
 		for item in "${parsedArray[@]}"
 		do
-			if [[ it >= 0 ]]
+			if [[ it -ge 0 ]]
 			then
 				factors[$it]=$item
 			fi
