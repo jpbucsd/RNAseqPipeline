@@ -110,7 +110,7 @@ for file in files:
         if char == '/':
             nMark = i
     figName = b[nMark + 1:-4]
-    fig.savefig(oDir + "/" + figName + "/" + figName ".png")
+    fig.savefig(oDir + "/" + figName + "/" + figName + ".png")
     
     
     #remove values that are likely false positives, I am unsure if this step should be done after graphing or not, for now it will be
