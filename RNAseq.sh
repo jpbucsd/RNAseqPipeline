@@ -325,8 +325,6 @@ then
 			fi
 			it=$(expr $it + 1)
 		done
-		firstFactor[$it]=${parsedArray[1]}
-		it=$(expr $it + 1)
 	done < tempFile.slr
 	rm tempFile.slr
 	
@@ -360,11 +358,13 @@ then
 
 		firstFactorName=${factors[$(($factor1))]}
 		secondFactorName=${factors[$(($factor2))]}
+		echo "Rscript DifferentialExpression.R -1 $firstFactorName ${firstFactor[@]/%/.genes.results} -2 $secondFactorName ${secondFactor[@]/%/.genes.results} -d ${fqDir}/${oDir}"
+		
 		Rscript DifferentialExpression.R -1 $firstFactorName "${firstFactor[@]/%/.genes.results}" -2 $secondFactorName "${secondFactor[@]/%/.genes.results}" -d "${fqDir}/${oDir}"
 
-		python results.py -f "${fqDir}/${oDir}/${firstFactorName}_vs_${secondFactorName}.csv}" --padj 0.5 --log10 5 --Llog10 30 --odir "${fqDir}/${oDir}/results"
+                echo "python results.py -f ${fqDir}/${oDir}/${firstFactorName}_vs_${secondFactorName}.csv} --padj 0.5 --log10 5 --Llog10 30 --odir ${fqDir}/${oDir}/results"
 
-	 
+		python results.py -f "${fqDir}/${oDir}/${firstFactorName}_vs_${secondFactorName}.csv}" --padj 0.5 --log10 5 --Llog10 30 --odir "${fqDir}/${oDir}/results"
 	done < tempFile.slr
 	rm tempFile.slr
 fi
