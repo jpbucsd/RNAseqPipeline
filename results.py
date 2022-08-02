@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import sys
 from matplotlib import pyplot as plt
 
 #usuage, takes CSV files outputed by DifferentialAnalysis.R as arguments
