@@ -120,7 +120,8 @@ res <- results(ddsTxi)
 res
 
 #write results
-ofnname <- paste(firstName,secondName,sep="_vs_")
-ofname <- paste(dirPath,ofnname,sep="/")
+ofnnname <- paste(firstName,secondName,sep="_vs_")
+ofnname <- paste(dirPath,ofnnname,sep="/")
+ofname <- paste(ofnname,"csv",sep=".")
 write.csv(as.data.frame(res), file=ofname)
                 
