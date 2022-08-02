@@ -103,13 +103,9 @@ for (file in files2) {
     append(files,fname)
 }
 print("looking for snames")
-for (name in snames) {
-    print(name)
-}
+snames
 print("looking for conditions")
-for (name in conditions) {
- print(name)   
-}
+conditions
 samples <- data.frame("run"=snames,"condition"=conditions)
 names(files) = samples$run
 
