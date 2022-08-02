@@ -327,8 +327,8 @@ then
 		done
 		firstFactor[$it]=${parsedArray[1]}
 		it=$(expr $it + 1)
-	done < sublist.txt
-	rm sublist.txt
+	done < tempFile.slr
+	rm tempFile.slr
 	
 	factor1="0"
 	factor2="0"
