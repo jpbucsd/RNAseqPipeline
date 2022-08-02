@@ -102,6 +102,14 @@ for (file in files2) {
     fname <- paste(dirPath,file,sep="/")
     append(files,fname)
 }
+print("looking for snames")
+for (name in snames) {
+    print(name)
+}
+print("looking for conditions")
+for (name in conditions) {
+ print(name)   
+}
 samples <- data.frame("run"=snames,"condition"=conditions)
 names(files) = samples$run
 
