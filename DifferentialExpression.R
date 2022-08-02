@@ -108,7 +108,7 @@ names(files) = samples$run
 #convert RSEM results
 txi <- tximport(files, type = "rsem")
 txi$length[txi$length == 0] <- 1
-ddsTxi <- DESeqDataSetFromTximport(txi,coData = samples, design = ~ condition)
+ddsTxi <- DESeqDataSetFromTximport(txi,colData = samples, design = ~ condition)
 
 #filtering, filter low counts to ignore them
 keep <- rowSums(counts(ddsTxi)) >= 10
