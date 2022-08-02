@@ -102,9 +102,6 @@ for (file in files2) {
     fname <- paste(dirPath,file,sep="/")
     append(files,fname)
 }
-for (names in snames) {
-    print(names)
-}
 samples <- data.frame("run"=snames,"condition"=conditions)
 names(files) = samples$run
 
