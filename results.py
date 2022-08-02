@@ -110,7 +110,7 @@ for file in files:
     for i, char in enumerate(file):
         if char == '/':
             nMark = i
-    figName = b[nMark + 1:-4]
+    figName = file[nMark + 1:-4]
     fig.savefig(oDir + "/" + figName + "/" + figName + ".png")
     
     
