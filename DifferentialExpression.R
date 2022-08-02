@@ -114,6 +114,11 @@ ddsTxi <- DESeqDataSetFromTximport(txi,colData = samples, design = ~ condition)
 keep <- rowSums(counts(ddsTxi)) >= 10
 ddsTxi <- ddsTxi[keep,]
 
+##### Perform deseq2 #####
+ddsTxi <- DESeq(ddsTxi)
+res <- results(ddsTxi)
+res
+
 #write results
 ofnname <- paste(firstName,secondName,sep="_vs_")
 ofname <- paste(dirPath,ofnname,sep="/")
