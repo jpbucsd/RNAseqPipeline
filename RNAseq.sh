@@ -340,7 +340,7 @@ then
 
 		firstFactor[0]=""
 		it=0
-		cat $slr | grep -n "\t${factor1}" > stempFile.slr
+		cat $slr | grep -n "~${factor1}" > stempFile.slr
 		while IFS=$'\t' read -r -a sparsedArray
 		do
 			firstFactor[$it]=${sparsedArray[1]}
@@ -350,7 +350,7 @@ then
 
 		secondFactor[0]=""
 		it=0
-		cat $slr | grep -n "\t${factor2}" > stempFile.slr
+		cat $slr | grep -n "~${factor2}" > stempFile.slr
 		while IFS=$'\t' read -r -a sparsedArray
 		do
 			secondFactor[$it]=${sparsedArray[1]}
