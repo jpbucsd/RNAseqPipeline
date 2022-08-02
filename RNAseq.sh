@@ -335,8 +335,8 @@ then
 	cat $slr | grep -n "Comparison:" > tempFile.slr
 	while IFS=$'\t' read -r -a parsedArray
 	do
-		factor1 = "${parsedArray[1]}"
-		factor2 = "${parsedArray[2]}"
+		factor1="${parsedArray[1]}"
+		factor2="${parsedArray[2]}"
 
 		firstFactor[0]=""
 		it=0
