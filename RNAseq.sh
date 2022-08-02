@@ -362,9 +362,9 @@ then
 		
 		Rscript DifferentialExpression.R -1 $firstFactorName "${firstFactor[@]/%/.genes.results}" -2 $secondFactorName "${secondFactor[@]/%/.genes.results}" -d "${fqDir}/${oDir}"
 
-                echo "python results.py -f ${fqDir}/${oDir}/${firstFactorName}_vs_${secondFactorName}.csv} --padj 0.5 --log10 5 --Llog10 30 --odir ${fqDir}/${oDir}/results"
+                echo "python results.py -f ${fqDir}/${oDir}/${firstFactorName}_vs_${secondFactorName}.csv --padj 0.5 --log10 5 --Llog10 30 --odir ${fqDir}/${oDir}/results"
 
-		python results.py -f "${fqDir}/${oDir}/${firstFactorName}_vs_${secondFactorName}.csv}" --padj 0.5 --log10 5 --Llog10 30 --odir "${fqDir}/${oDir}/results"
+		python results.py -f "${fqDir}/${oDir}/${firstFactorName}_vs_${secondFactorName}.csv" --padj 0.5 --log10 5 --Llog10 30 --odir "${fqDir}/${oDir}/results"
 	done < tempFile.slr
 	rm tempFile.slr
 fi
