@@ -78,8 +78,8 @@ for arg in sys.argv:
 
 for file in files:
     #a dataframe is made from the deseq csv file. results with no pvalue are cleaved, the first column is named gene ID, and results with padj below < 0.5 are selected for.
-    #a dataframe deresults2 is made from files with a -log10pval above 5, to filter for significant data.
-    #using deresults2, two dataframes are made, those with positive and negative log2FoldChanges to represent those that are down or up regulated.
+    #a dataframe deresultsSig is made from files with a -log10pval above 5, to filter for significant data.
+    #using deresultsSig, two dataframes are made, those with positive and negative log2FoldChanges to represent those that are down or up regulated.
 
     deresults = pd.read_csv(file)
     deresults = deresults[-np.isnan(deresults["pvalue"])]
@@ -94,8 +94,8 @@ for file in files:
     fig = plt.figure()
     fig.set_size_inches((10,10))
     volcano = fig.add_subplot(111)
-    volcano.scatter(deresultsNSig["log2FoldChange"],-1*np.log10(deresults1["pvalue"]),s=2,alpha=0.5,color="blue")
-    volcano.scatter(deresultsSig["log2FoldChange"],-1*np.log10(deresults2["pvalue"]),s=2,alpha=0.5,color="red")
+    volcano.scatter(deresultsNSig["log2FoldChange"],-1*np.log10(deresultsNSig["pvalue"]),s=2,alpha=0.5,color="blue")
+    volcano.scatter(deresultsSig["log2FoldChange"],-1*np.log10(deresultsSig["pvalue"]),s=2,alpha=0.5,color="red")
     volcano.set_xlabel("Log2FoldChange")
     volcano.set_ylabel("Log10 pvalue")
     volcano.axvline(x=0.0, linestyle="dashed", color="grey",
