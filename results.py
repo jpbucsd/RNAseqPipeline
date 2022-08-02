@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import sys
+import os
 from matplotlib import pyplot as plt
 
 #usuage, takes CSV files outputed by DifferentialAnalysis.R as arguments
@@ -104,7 +105,12 @@ for file in files:
     #a for loop uses the deresults3 dataframe to annotate the geneIDs of the most significant genes
     for index, row in deresultsESig.iterrows():
         volcano.text(row["log2FoldChange"],-1*np.log10(row["pvalue"]),row["gene_id"], horizontalalignment='left', size=10, color='black')
+        print("x: " + row["log2FoldChange"] + ", y: " + -1*np.log10(row["pvalue"]) + " , name: " + row["gene_id"])
     
+    if not os.path.exists(oDir):
+      os.makedirs(oDir)
+    if not os.path.exists(oDir + "/" + figName):
+      os.makedirs(oDir  + "/" + figName)
     #save the file!
     nMark=0
     for i, char in enumerate(file):
