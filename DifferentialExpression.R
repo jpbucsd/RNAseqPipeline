@@ -17,8 +17,8 @@ firstName <- ""
 secondName <- ""
 files1 <- c()
 files2 <- c()
-files1ind <- 1
-files2ind <- 1
+files1ind <- 0
+files2ind <- 0
 for (arg in args) {
     if(substring(arg, first = 1, last = 1) == "-")
     {
@@ -58,8 +58,8 @@ for (arg in args) {
                         named = TRUE
                   }
              } else {
-                  files1[files1ind] = arg
                   files1ind = files1ind + 1
+                  files1[files1ind] = arg
              }
           } else if (second) {
             #assume second
@@ -71,7 +71,7 @@ for (arg in args) {
                         secondName = substring(arg, first = 0, last = nchar(arg) - 14)
                         #we also must declare the first variable
                         files2[1] = arg
-                        #files2ind = files2ind + 1
+                        files2ind = files2ind + 1
                         named = TRUE
                   } else {
                         secondName = arg
@@ -93,19 +93,15 @@ conditions <- c(rep(firstName,files1ind),rep(secondName,files2ind))
 files <- c()
 snames <- c()
 for (file in files1) {
-    append(snames, substring(file, first = 0, last = nchar(file) - 14))
+    snames <- append(snames, substring(file, first = 0, last = nchar(file) - 14))
     fname <- paste(dirPath,file,sep="/")
-    append(files,fname)
+    files <- append(files,fname)
 }
 for (file in files2) {
-    append(snames, substring(file, first = 0, last = nchar(file) - 14))
+    snames <- append(snames, substring(file, first = 0, last = nchar(file) - 14))
     fname <- paste(dirPath,file,sep="/")
-    append(files,fname)
+    files <- append(files,fname)
 }
-print("looking for snames")
-snames
-print("looking for conditions")
-conditions
 samples <- data.frame("run"=snames,"condition"=conditions)
 names(files) = samples$run
 
