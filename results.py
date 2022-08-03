@@ -144,3 +144,12 @@ for file in files:
     fileU = open(oDir + "/" + figName + "/" + "upRegulatedGenes.txt","w")
     fileU.writelines(URlist)
     fileU.close()
+    
+    #producing a background file for DAVID go anaylsis
+    if not os.path.exists(oDir + "/" + "background.txt"):
+      BGlist = ''
+      for index, row in deresults.iterrows():
+          BGlist += row["gene_id"] + '\n'
+      fileB = open(oDir + "/" + "background.txt","w")
+      fileB.writelines(BGlist)
+      fileB.close()
