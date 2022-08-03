@@ -105,7 +105,7 @@ for file in files:
     #a for loop uses the deresults3 dataframe to annotate the geneIDs of the most significant genes
     for index, row in deresultsESig.iterrows():
         volcano.text(row["log2FoldChange"],-1*np.log10(row["pvalue"]),row["gene_id"], horizontalalignment='left', size=10, color='black')
-        print("x: " + row["log2FoldChange"] + ", y: " + -1*np.log10(row["pvalue"]) + " , name: " + row["gene_id"])
+        print("x: " + str(row["log2FoldChange"]) + ", y: " + str(-1*np.log10(row["pvalue"])) + " , name: " + str(row["gene_id"]))
     
     if not os.path.exists(oDir):
       os.makedirs(oDir)
