@@ -110,16 +110,19 @@ for file in files:
         volcano.text(row["log2FoldChange"],-1*np.log10(row["pvalue"]),row["gene_id"], horizontalalignment='left', size=10, color='black')
         print("x: " + str(row["log2FoldChange"]) + ", y: " + str(-1*np.log10(row["pvalue"])) + " , name: " + str(row["gene_id"]))
     
-    if not os.path.exists(oDir):
-      os.makedirs(oDir)
-    if not os.path.exists(oDir + "/" + figName):
-      os.makedirs(oDir  + "/" + figName)
+    
     #save the file!
     nMark=0
     for i, char in enumerate(file):
         if char == '/':
             nMark = i
     figName = file[nMark + 1:-4]
+    
+    if not os.path.exists(oDir):
+      os.makedirs(oDir)
+    if not os.path.exists(oDir + "/" + figName):
+      os.makedirs(oDir  + "/" + figName)
+    
     fig.savefig(oDir + "/" + figName + "/" + figName + ".png")
     
     
