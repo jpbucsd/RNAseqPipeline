@@ -70,13 +70,16 @@ for arg in sys.argv:
     files.append(arg)
   elif padFlag:
     padJ=float(arg)
+    print("setting padj value to " + str(padJ))
   elif logFlag:
     pval=float(arg)
+    print("setting pval value to " + str(pval))
   elif llogFlag:
     lval=float(arg)
+    print("setting label value to " + str(lval))
   elif outFlag:
     oDir=arg
-
+    print("setting odir value to " + str(oDir))
 for file in files:
     #a dataframe is made from the deseq csv file. results with no pvalue are cleaved, the first column is named gene ID, and results with padj below < 0.5 are selected for.
     #a dataframe deresultsSig is made from files with a -log10pval above 5, to filter for significant data.
