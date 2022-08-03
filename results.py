@@ -40,21 +40,21 @@ for arg in sys.argv:
           outFlag=False
       elif arg[2] == 'l':
           #log10 selected
-          fileFlag=True
+          fileFlag=False
           padFlag=False
-          logFlag=False
+          logFlag=True
           llogFlag=False
           outFlag=False
       elif arg[2] == 'L':
           #log10 selected
-          fileFlag=True
+          fileFlag=False
           padFlag=False
           logFlag=False
           llogFlag=True
           outFlag=False
       elif arg[2] == "o":
           #odir sleected
-          fileFlag=True
+          fileFlag=False
           padFlag=False
           logFlag=False
           llogFlag=False
