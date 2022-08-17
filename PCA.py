@@ -11,6 +11,9 @@ import pandas as pd
 import sys
 import os
 
+from sklearn.decomposition import PCA
+import matplotlib.pyplot as plt
+
 #usage
 #python PCA.py -f <file1.genes.results> <file2.genes.results> ... <fileN.genes.results> --oDir <output/directory/of/PCA/chart> --numComps <number of comparissons for PCA, default 2, must be less than sample number. There must be at least 3 files!>
 # python PCAtest.py -f /oasis/tscc/scratch/jpburkhardt/RNAseqPipeline/AltSplicing/RNAseqOut/Alpha-Diff.genes.results /oasis/tscc/scratch/jpburkhardt/RNAseqPipeline/AltSplicing/RNAseqOut/Alpha-Prog.genes.results /oasis/tscc/scratch/jpburkhardt/RNAseqPipeline/AltSplicing/RNAseqOut/Hotel-Diff.genes.results /oasis/tscc/scratch/jpburkhardt/RNAseqPipeline/AltSplicing/RNAseqOut/Hotel-Prog.genes.results /oasis/tscc/scratch/jpburkhardt/RNAseqPipeline/AltSplicing/RNAseqOut/Golf-Prog.genes.results /oasis/tscc/scratch/jpburkhardt/RNAseqPipeline/AltSplicing/RNAseqOut/Golf-Diff.genes.results --oDir PCAtest6/PCA --numComps 2
@@ -75,8 +78,29 @@ dataFrame = dataFrames[0]
 for i in range(len(dataFrames) - 1 ):
   dataFrame = pd.merge(dataFrame,dataFrames[i + 1],on=['gene_id'], how='outer').fillna(0)
 transposeFrame = dataFrame.T
-transposeFrame = transposeFrame.rename(columns={transposeFrame.columns[0]:'datasets'})
+#transposeFrame = transposeFrame.rename(columns={transposeFrame.columns[0]:'datasets'})#this line actually names gene1 datasets instead of replacing geneid
 print(transposeFrame.head(10))
+
+#create plot
+
+#shape 0 represents the number of samples while shape 1 represents the number of components, however we must use shape 0 to cut the thousands of samples (genes) as we can only perform PCA with the same or less components as samples.
+#this picks the first 6 rows which is wrong. I must figure out how to combine the data.
+shrunkFrame = transposeFrame.iloc[:, 0:6]
+pca = PCA(n_components=shrunkFrame.shape[1])
+pca.fit(shrunkFrame)
+
+loadings = pd.DataFrame(pca.components_.T,
+columns=['PC%s' % _ for _ in range(len(shrunkFrame.columns))],
+index=shrunkFrame.index)
+print(loadings)
+
+ax1 = loadings.plot.scatter(x='PC1', y='PC2',cmap='viridis')#to add colors use c= list of colors!
+for i, label in enumerate(loadings.index):
+    ax1.annotate(label, (loadings.iloc[:,1][i], loadings.iloc[:,2][i]))
+ax1.figure.savefig('PCAtestSK5.png')
+
+#old method below
+#this is deprecated, and will crash. the code is in a state of disrepair.
 
 adata = sc.AnnData(transposeFrame)
 
