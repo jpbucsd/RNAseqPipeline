@@ -376,9 +376,12 @@ then
 		
 		if [[ $pca != 0 ]]
 		then
-			echo "python PCA.py -f ${fqDir}/${oDir}/${firstFactor[@]/%/.genes.results} ${fqDir}/${oDir}/${secondFactor[@]/%/.genes.results} --oDir ${fqDir}/${oDir} --numComps 2"
+			first_PRE=("${firstFactor[@]/#/$fqDir/$oDir/}")
+			second_PRE=("${secondFactor[@]/#/$fqDir/$oDir/}")
 			
-			python PCA.py -f "${fqDir}/${oDir}/${firstFactor[@]/%/.genes.results}" "${fqDir}/${oDir}/${secondFactor[@]/%/.genes.results}" --oDir "${fqDir}/${oDir}" --numComps 2
+			echo "python PCA.py -f ${first_PRE[@]/%/.genes.results} ${second_PRE[@]/%/.genes.results} --oDir ${fqDir}/${oDir} --numComps 2"
+			
+			python PCA.py -f "${first_PRE[@]/%/.genes.results}" "${second_PRE[@]/%/.genes.results}" --oDir "${fqDir}/${oDir}" --numComps 2
 		fi
 	done < tempFile.slr
 	rm tempFile.slr
