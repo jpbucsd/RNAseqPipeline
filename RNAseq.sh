@@ -18,6 +18,7 @@ pair2="_2"
 slr=""
 sFlag=0
 analysis=0
+pca=0
 
 
 rsd=$(pwd) #directory where RNA seq commands are stored, may not be root of fastq reads
@@ -90,6 +91,10 @@ do
 		if [[ "$var" == "-"*"a"* ]]
 		then
 			align=2
+		fi
+		if [[ "$var" == "-"*"PCA"* ]]
+		then
+			pca=1
 		fi
 	elif [[ $pFlag == 1 ]]
 	then
@@ -310,7 +315,7 @@ then
 		fi
 	fi
 fi
-if [[ $analysis != 0 ]]
+if [[ $analysis != 0 ]] || [[ $pca != 0 ]]
 then
 	factors[0]=""
 	cat $slr | grep -n "Attributes:" > tempFile.slr
@@ -356,15 +361,25 @@ then
 		done < stempFile.slr
 		rm stempFile.slr
 
-		firstFactorName=${factors[$(($factor1))]}
-		secondFactorName=${factors[$(($factor2))]}
-		echo "Rscript DifferentialExpression.R -1 $firstFactorName ${firstFactor[@]/%/.genes.results} -2 $secondFactorName ${secondFactor[@]/%/.genes.results} -d ${fqDir}/${oDir}"
+		if [[ $analysis != 0 ]]
+		then
+			firstFactorName=${factors[$(($factor1))]}
+			secondFactorName=${factors[$(($factor2))]}
+			echo "Rscript DifferentialExpression.R -1 $firstFactorName ${firstFactor[@]/%/.genes.results} -2 $secondFactorName ${secondFactor[@]/%/.genes.results} -d ${fqDir}/${oDir}"
+
+			Rscript DifferentialExpression.R -1 $firstFactorName "${firstFactor[@]/%/.genes.results}" -2 $secondFactorName "${secondFactor[@]/%/.genes.results}" -d "${fqDir}/${oDir}"
+
+			echo "python results.py -f ${fqDir}/${oDir}/${firstFactorName}_vs_${secondFactorName}.csv --padj 0.5 --log10 5 --Llog10 30 --odir ${fqDir}/${oDir}/results"
+
+			python results.py -f "${fqDir}/${oDir}/${firstFactorName}_vs_${secondFactorName}.csv" --padj 0.5 --log10 5 --Llog10 30 --odir "${fqDir}/${oDir}/results"
+		fi
 		
-		Rscript DifferentialExpression.R -1 $firstFactorName "${firstFactor[@]/%/.genes.results}" -2 $secondFactorName "${secondFactor[@]/%/.genes.results}" -d "${fqDir}/${oDir}"
-
-                echo "python results.py -f ${fqDir}/${oDir}/${firstFactorName}_vs_${secondFactorName}.csv --padj 0.5 --log10 5 --Llog10 30 --odir ${fqDir}/${oDir}/results"
-
-		python results.py -f "${fqDir}/${oDir}/${firstFactorName}_vs_${secondFactorName}.csv" --padj 0.5 --log10 5 --Llog10 30 --odir "${fqDir}/${oDir}/results"
+		if [[ $pca != 0 ]]
+		then
+			echo "python PCA.py -f ${firstFactor[@]/%/.genes.results} ${secondFactor[@]/%/.genes.results} --oDir ${fqDir}/${oDir} --numComps 2"
+			
+			python PCA.py -f "${firstFactor[@]/%/.genes.results}" "${secondFactor[@]/%/.genes.results}" --oDir "${fqDir}/${oDir}" --numComps 2
+		fi
 	done < tempFile.slr
 	rm tempFile.slr
 fi
