@@ -1,5 +1,3 @@
-#it is strange to perform PCA with so few "cells", but this is what was asked of me...
-
 #first use the following command to install in your home directory
 #!pip install --user scanpy harmonypy louvain
 
@@ -15,14 +13,12 @@ from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 
 #usage
-#python PCA.py -f <file1.genes.results> <file2.genes.results> ... <fileN.genes.results> --oDir <output/directory/of/PCA/chart> --numComps <number of comparissons for PCA, default 2, must be less than sample number. There must be at least 3 files!>
-# python PCAtest.py -f /oasis/tscc/scratch/jpburkhardt/RNAseqPipeline/AltSplicing/RNAseqOut/Alpha-Diff.genes.results /oasis/tscc/scratch/jpburkhardt/RNAseqPipeline/AltSplicing/RNAseqOut/Alpha-Prog.genes.results /oasis/tscc/scratch/jpburkhardt/RNAseqPipeline/AltSplicing/RNAseqOut/Hotel-Diff.genes.results /oasis/tscc/scratch/jpburkhardt/RNAseqPipeline/AltSplicing/RNAseqOut/Hotel-Prog.genes.results /oasis/tscc/scratch/jpburkhardt/RNAseqPipeline/AltSplicing/RNAseqOut/Golf-Prog.genes.results /oasis/tscc/scratch/jpburkhardt/RNAseqPipeline/AltSplicing/RNAseqOut/Golf-Diff.genes.results --oDir PCAtest6/PCA --numComps 2
-
+#python PCA.py -f <file1.genes.results> <file2.genes.results> ... <fileN.genes.results> --oDir <output/directory/of/PCA/chart> --numComps <number of comparissons for PCA, default is sample number. There must be at least 2 files!>
 fileFlag=False
 ncFlag=False
 outFlag=False
 oDir=""
-nComps=2
+nComps=0
 files=[]
 for arg in sys.argv:
   if arg[0] == '-':
@@ -84,41 +80,31 @@ print(transposeFrame.head(10))
 #create plot
 
 #shape 0 represents the number of samples while shape 1 represents the number of components, however we must use shape 0 to cut the thousands of samples (genes) as we can only perform PCA with the same or less components as samples.
-#this picks the first 6 rows which is wrong. I must figure out how to combine the data.
-shrunkFrame = transposeFrame.iloc[:, 0:6]
-pca = PCA(n_components=shrunkFrame.shape[1])
-pca.fit(shrunkFrame)
-
-loadings = pd.DataFrame(pca.components_.T,
-columns=['PC%s' % _ for _ in range(len(shrunkFrame.columns))],
-index=shrunkFrame.index)
-print(loadings)
-
-ax1 = loadings.plot.scatter(x='PC1', y='PC2',cmap='viridis')#to add colors use c= list of colors!
-for i, label in enumerate(loadings.index):
-    ax1.annotate(label, (loadings.iloc[:,1][i], loadings.iloc[:,2][i]))
-ax1.figure.savefig('PCAtestSK5.png')
-
-#old method below
-#this is deprecated, and will crash. the code is in a state of disrepair.
-
-adata = sc.AnnData(transposeFrame)
-
-sc.pp.pca(adata, n_comps=nComps, zero_center=True, svd_solver='arpack', random_state=0, return_info=False, use_highly_variable=None, dtype='float32', copy=False, chunked=False, chunk_size=None)
+shrunkFrame = transposeFrame.iloc[:, 10:16]
+if nComps == 0 or nComps > transposeFrame.shape[0]:
+        nComps = transposeFrame.shape[0]
+pca = PCA(nComps)
+pcaDF = pd.DataFrame(pca.fit_transform(transposeFrame))
+pcaDF.index=transposeFrame.index
+pcaDF.columns=['PC%s' % _ for _ in range(len(pcaDF.columns))]
+print(pcaDF)
+print(pca.explained_variance_ratio_)
+ax1 = pcaDF.plot.scatter(x='PC0', y='PC1',cmap='viridis')#to add colors use c= list of colors!
+for i, label in enumerate(pcaDF.index):
+    ax1.annotate(label, (pcaDF.iloc[:,0][i], pcaDF.iloc[:,1][i]))
+ax1.set_xlabel("PC1 (" + str(round(pca.explained_variance_ratio_[0]*100,1)) + "%)")
+ax1.set_ylabel("PC2 (" + str(round(pca.explained_variance_ratio_[1]*100,1)) + "%)")
+ax1.tick_params(axis='x', labelsize=5)
+ax1.tick_params(axis='y', labelsize=5)
 
 #warning, this oDir thing needs to be done to all files with output or else they may attempt to save in TSCC home directory!
 imgName=""
 if(oDir == ""):
   if not os.path.exists(oDir +  "figures/pca"):
       os.makedirs(oDir +  "figures/pca")
-  imgName= "/PCA.png"
+  imgName= 'figures/pca/PCA.png'
 else:
   if not os.path.exists(oDir +  "/figures/pca/"):
       os.makedirs(oDir +  "/figures/pca/")
-  imgName="/PCA.png"
-if not os.path.exists("figures/pca"):
-    os.makedirs("figures/pca")
-size = 6000/len(files)
-sc.pl.pca(adata,save=imgName,size=size,color="datasets",legend_fontsize=10,legend_loc='on data',colorbar_loc=None)
-cmd = "mv figures/pca/PCA.png " + oDir + "/figures/pca/"
-os.system(cmd)
+  imgName= oDir + '/figures/pca/PCA.png'
+ax1.figure.savefig(imgName)
