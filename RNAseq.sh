@@ -19,6 +19,12 @@ slr=""
 sFlag=0
 analysis=0
 pca=0
+padj=0.5
+padFlag=0
+logT=5
+logTFlag=0
+logA=30
+logAFlag=0
 
 
 rsd=$(pwd) #directory where RNA seq commands are stored, may not be root of fastq reads
@@ -50,6 +56,18 @@ do
 	then
 		rFlag=0
 		readLength=$var
+	elif [[ $padFlag == 1 ]]
+	then
+		padFlag=0
+		padj=$var
+	elif [[ $logTFlag == 1 ]]
+	then
+		logTFlag=0
+		logT=$var
+	elif [[ $logAFlag == 1 ]]
+	then
+		logAFlag=0
+		logA=$var
 	elif [[ $sFlag == 1 ]]
 	then
 		sFlag=0
@@ -74,6 +92,18 @@ do
 		if [[ "$var" == *"-r"* ]]
 		then
 			rFlag=1
+		fi
+		if [[ "$var" == "-"*"PADJ" ]]
+		then
+			padFlag=1
+		fi
+		if [[ "$var" == "-"*"log10" ]]
+		then
+			logTFlag=1
+		fi
+		if [[ "$var" == "-"*"A" ]]
+		then
+			logAFlag=1
 		fi
 		if [[ "$var" == *"-p"* ]]
 		then
@@ -369,9 +399,9 @@ then
 
 			Rscript DifferentialExpression.R -1 $firstFactorName "${firstFactor[@]/%/.genes.results}" -2 $secondFactorName "${secondFactor[@]/%/.genes.results}" -d "${fqDir}/${oDir}"
 
-			echo "python results.py -f ${fqDir}/${oDir}/${firstFactorName}_vs_${secondFactorName}.csv --padj 0.5 --log10 5 --Llog10 30 --odir ${fqDir}/${oDir}/results"
+			echo "python results.py -f ${fqDir}/${oDir}/${firstFactorName}_vs_${secondFactorName}.csv --padj $padj --log10 $logT --Llog10 $logA --odir ${fqDir}/${oDir}/results"
 
-			python results.py -f "${fqDir}/${oDir}/${firstFactorName}_vs_${secondFactorName}.csv" --padj 0.5 --log10 5 --Llog10 30 --odir "${fqDir}/${oDir}/results"
+			python results.py -f "${fqDir}/${oDir}/${firstFactorName}_vs_${secondFactorName}.csv" --padj $padj --log10 $logT --Llog10 $logA --odir "${fqDir}/${oDir}/results"
 		fi
 		
 		if [[ $pca != 0 ]]
