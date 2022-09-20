@@ -25,6 +25,8 @@ logT=5
 logTFlag=0
 logA=30
 logAFlag=0
+threadFlag=0
+threads=0
 
 
 rsd=$(pwd) #directory where RNA seq commands are stored, may not be root of fastq reads
@@ -68,6 +70,10 @@ do
 	then
 		logAFlag=0
 		logA=$var
+	elif [[ $threadFlag == 1 ]]
+	then
+		threadFlag=0
+		threads=$var
 	elif [[ $sFlag == 1 ]]
 	then
 		sFlag=0
@@ -92,6 +98,10 @@ do
 		if [[ "$var" == *"-r"* ]]
 		then
 			rFlag=1
+		fi
+		if [[ "$var" == *"-t"* ]]
+		then
+			threadFlag=1
 		fi
 		if [[ "$var" == "-"*"PADJ" ]]
 		then
@@ -198,7 +208,7 @@ then
 		mkdir "genome${readLength}"
 		chmod -R 0777 "genome${readLength}"
 		#star requires 36GB of ram and 12 threads
-		STAR --runMode genomeGenerate --genomeFastaFiles GCF_000001405.40_GRCh38.p14_genomic.fna --sjdbGTFfile GCF_000001405.40_GRCh38.p14_genomic.gtf --genomeDir "genome${readLength}" --genomeChrBinNbits $factor --runThreadN 16 --sjdbOverhang $overhang
+		STAR --runMode genomeGenerate --genomeFastaFiles GCF_000001405.40_GRCh38.p14_genomic.fna --sjdbGTFfile GCF_000001405.40_GRCh38.p14_genomic.gtf --genomeDir "genome${readLength}" --genomeChrBinNbits $factor --runThreadN $threads --sjdbOverhang $overhang
 
 	fi
 
@@ -213,7 +223,7 @@ then
 		then
 			cp GCF_000001405.40_GRCh38.p14_genomic.fna GCF_000001405.40_GRCh38.p14_genomic.fa
 		fi
-		rsem-prepare-reference --gtf GCF_000001405.40_GRCh38.p14_genomic.gtf --num-threads 16 GCF_000001405.40_GRCh38.p14_genomic.fa GCF_000001405.40_GRCh38.p14_genomic
+		rsem-prepare-reference --gtf GCF_000001405.40_GRCh38.p14_genomic.gtf --num-threads $threads GCF_000001405.40_GRCh38.p14_genomic.fa GCF_000001405.40_GRCh38.p14_genomic
 	fi
 
 	#leave refGen and return to normal
@@ -279,10 +289,10 @@ then
 					--sjdbScore 1 \
 					--limitBAMsortRAM 50000000000"
 
-				 STAR --genomeDir ${rsd}/refGen/genome$readLength --readFilesIn ${read1} ${read2} --outFileNamePrefix "${oDir}Alignment/${base}" --runThreadN 16 --quantMode TranscriptomeSAM ${STAROPTS}
+				 STAR --genomeDir ${rsd}/refGen/genome$readLength --readFilesIn ${read1} ${read2} --outFileNamePrefix "${oDir}Alignment/${base}" --runThreadN $threads --quantMode TranscriptomeSAM ${STAROPTS}
 
 				 echo "calculating expression of ${base}"
-				 rsem-calculate-expression --num-threads 16 --paired-end --alignments "${oDir}Alignment/${base}Aligned.toTranscriptome.out.bam" ${rsd}/refGen/GCF_000001405.40_GRCh38.p14_genomic "${oDir}${base}"
+				 rsem-calculate-expression --num-threads $threads --paired-end --alignments "${oDir}Alignment/${base}Aligned.toTranscriptome.out.bam" ${rsd}/refGen/GCF_000001405.40_GRCh38.p14_genomic "${oDir}${base}"
 			done
 		fi
 		#leave the raw read directory, where all alignments and quantifications have now been saved to
@@ -313,13 +323,13 @@ then
 			for filename in $fqDir/*.fq 
 			do
 				echo "aligning $filename"
-				STAR --genomeDir refGen/genome --readFilesIn ${filename} --outFileNamePrefix "$oDir${filename%.*}" --runThreadN 16 --quantMode TranscriptomeSAM
+				STAR --genomeDir refGen/genome --readFilesIn ${filename} --outFileNamePrefix "$oDir${filename%.*}" --runThreadN $threads --quantMode TranscriptomeSAM
 			done
 
 			for filename in $fqDir/*.fastq 
 			do
 				echo "aligning $filename"
-				STAR --genomeDir refGen/genome --readFilesIn ${filename} --outFileNamePrefix "$oDir${filename%.*}" --runThreadN 16 --quantMode TranscriptomeSAM
+				STAR --genomeDir refGen/genome --readFilesIn ${filename} --outFileNamePrefix "$oDir${filename%.*}" --runThreadN $threads --quantMode TranscriptomeSAM
 			done
 
 			#quantifying gene expression
@@ -329,7 +339,7 @@ then
 			#for filename in $oDir$fqDir/*.out.sam
 			#do
 			#	echo "converting $filename to "${filename%.*}.bam""
-			#	samtools view --threads 16 -S -b $filename > "${filename%.*}.bam"
+			#	samtools view --threads $threads -S -b $filename > "${filename%.*}.bam"
 			#done
 
 			for filename in $oDir$fqDir/*.toTranscriptome.out.bam
@@ -337,7 +347,7 @@ then
 				echo "calculating expression of ${filename}"
 				sample_fname="${filename##*/}"
 				sample_name="${sample_fname%.*}"
-				rsem-calculate-expression --num-threads 16 --alignments "${filename%.*}.bam" refGen/GCF_000001405.40_GRCh38.p14_genomic "${sample_name}"
+				rsem-calculate-expression --num-threads $threads --alignments "${filename%.*}.bam" refGen/GCF_000001405.40_GRCh38.p14_genomic "${sample_name}"
 			done
 
 			#cd ../
