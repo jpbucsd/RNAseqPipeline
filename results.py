@@ -131,6 +131,12 @@ for file in files:
     downRegulated = deresultsSig[deresultsSig["log2FoldChange"] < 0]
     upRegulated = deresultsSig[deresultsSig["log2FoldChange"] > 0]
     
+    #sort values in downRegulated by ascending order
+    downRegulated = downRegulated.sort_values(by=["log2FoldChange"], ascending=True)
+    #sort values in upRegulated by descending order
+    upRegulated = upRegulated.sort_values(by=["log2FoldChange"], ascending=False)
+    #now the gene lists are listed in order of decreasing log2 fold change
+    
     DRlist = ''
     for index, row in downRegulated.iterrows():
         DRlist += row["gene_id"] + '\n'
