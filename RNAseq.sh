@@ -238,7 +238,7 @@ then
 
 	if [[ $paired == 1 ]]
 	then
-		cd $fqDir
+		cd "$fqDir"
 		for filename in *.fastq.gz
 		do
 			mv $filename ${filename%.fastq.gz}.fq.gz
