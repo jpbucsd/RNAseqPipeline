@@ -295,6 +295,12 @@ then
 				 rsem-calculate-expression --num-threads $threads --paired-end --alignments "${oDir}Alignment/${base}Aligned.toTranscriptome.out.bam" ${rsd}/refGen/GCF_000001405.40_GRCh38.p14_genomic "${oDir}${base}"
 			done
 		fi
+		#rezip the files
+		for filename in *.fq
+		do
+			echo "rezipping $filename"
+			gzip $filename
+		done
 		#leave the raw read directory, where all alignments and quantifications have now been saved to
 		#cd ../
 		cd $rsd
