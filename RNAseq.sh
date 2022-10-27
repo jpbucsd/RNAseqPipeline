@@ -135,6 +135,7 @@ do
 		if [[ "$var" == "-"*"PCA"* ]]
 		then
 			pca=1
+			logAFlag=0
 		fi
 	elif [[ $pFlag == 1 ]]
 	then
