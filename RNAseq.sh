@@ -27,7 +27,8 @@ logA=30
 logAFlag=0
 threadFlag=0
 threads=0
-
+qReport=0
+trim=0
 
 rsd=$(pwd) #directory where RNA seq commands are stored, may not be root of fastq reads
 
@@ -137,6 +138,14 @@ do
 			pca=1
 			logAFlag=0
 		fi
+		if [[ "$var" == "-Q"* ]]
+		then
+			qReport=1
+		fi
+		if [[ "$var" == "-T"* ]]
+		then
+			trim=1
+		fi
 	elif [[ $pFlag == 1 ]]
 	then
 		pFlag=2
@@ -153,6 +162,42 @@ do
 		fi
 	fi
 done
+
+
+if [[ $qReport != 0 ]]
+then
+		cd "$fqDir"
+		for filename in *.fastq.gz
+		do
+			mv $filename ${filename%.fastq.gz}.fq.gz
+		done
+		
+		
+
+		for filename in *.fq.gz
+		do
+			echo "unzipping $filename"
+			gzip -dc $filename	
+		done
+
+
+		mkdir quality
+		chmod -R 0777 quality
+		
+		for filename in *.fq
+		do
+			echo "assessing quality of $filename"
+			fastqc -o quality $filename
+		done
+		
+		cd $rsd	
+fi
+
+if [[ $trim != 0 ]]
+then
+	#todo
+
+fi
 
 #this script produces an index file from the referencce genome (fasta format) and a GTF annotations file.
 #the produced index file will next be used in the second step written in the script align.sh
