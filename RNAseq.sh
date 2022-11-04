@@ -176,8 +176,11 @@ then
 
 		for filename in *.fq.gz
 		do
-			echo "unzipping $filename"
-			gzip -dc $filename	
+			if [ ! -f "${filename.fq%.*}" ]
+			then
+				echo "unzipping $filename"
+				gzip -dc $filename
+			fi	
 		done
 
 
@@ -196,7 +199,44 @@ fi
 if [[ $trim != 0 ]]
 then
 	#todo
-
+	#${pair1}
+	
+	cd "$fqDir"
+	for filename in *.fastq.gz
+	do
+		mv $filename ${filename%.fastq.gz}.fq.gz
+	done
+	for filename in *.fq.gz
+	do
+		if [ ! -f "${filename.fq%.*}" ]
+		then
+			echo "unzipping $filename"
+			gzip -dc $filename
+		fi
+	done
+	
+	for filename in *${pair1}.fq
+	do
+		if [ -f "${filename%${pair1}.fq}${pair2}.fq" ]
+		then
+			echo "cleaning $filename and ${filename%${pair1}.fq}${pair2}.fq"
+			fastp -i "${filename}" -o "${filename%${pair1}*}${pair1}_clean.fq" -I "${filename%${pair1}.fq}${pair2}.fq" -O "${filename%${pair1}*}${pair2}_clean.fq"
+		else
+			"ERROR: no matching pair for $filename ; will not be cleaned/included"
+		fi	
+	done
+		
+	for filename in *_clean.fq
+	do	
+		echo "removing ${filename%_clean.fq}.fq"
+		rm "${filename%_clean.fq}.fq"
+		
+		echo "assessing quality of cleaned file $filename"
+		fastqc -o quality $filename
+		
+		echo "renaming $filename to ${filename%_clean.fq}.fq"
+		mv $filename "${filename%_clean.fq}.fq"
+	done
 fi
 
 #this script produces an index file from the referencce genome (fasta format) and a GTF annotations file.
@@ -292,10 +332,14 @@ then
 
 		for filename in *.fq.gz
 		do
-			echo "unzipping $filename"
-			gzip -dc $filename
+			if [ ! -f "${filename.fq%.*}" ]
+			then
+				echo "unzipping $filename"
+				gzip -dc $filename
+			fi
 		done
 		it=0
+		
 		for filename in *${pair1}.fq
 		do
 			if [ -f "${filename%${pair1}.fq}${pair2}.fq" ]
@@ -334,9 +378,9 @@ then
 					--alignSJDBoverhangMin 1 \
 					--sjdbScore 1 \
 					--limitBAMsortRAM 50000000000"
-
+				
 				 STAR --genomeDir ${rsd}/refGen/genome$readLength --readFilesIn ${read1} ${read2} --outFileNamePrefix "${oDir}Alignment/${base}" --runThreadN $threads --quantMode TranscriptomeSAM ${STAROPTS}
-
+				 
 				 echo "calculating expression of ${base}"
 				 rsem-calculate-expression --num-threads $threads --paired-end --alignments "${oDir}Alignment/${base}Aligned.toTranscriptome.out.bam" ${rsd}/refGen/GCF_000001405.40_GRCh38.p14_genomic "${oDir}${base}"
 			done
