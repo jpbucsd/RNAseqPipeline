@@ -15,11 +15,13 @@ padFlag=False
 logFlag=False
 llogFlag=False
 outFlag=False
+gFlag=False
 oDir=""
 padJ=0.5
 pval=5
 lval=30
 files=[]
+geneList=""
 for arg in sys.argv:
   if arg[0] == '-':
     if arg[1] == '-':
@@ -31,6 +33,7 @@ for arg in sys.argv:
           logFlag=False
           llogFlag=False
           outFlag=False
+          gFlag=False
         elif arg[3] == 's':
           #log10 selected
           fileFlag=False
@@ -38,6 +41,7 @@ for arg in sys.argv:
           logFlag=True
           llogFlag=False
           outFlag=False
+          gFlag=False
       elif arg[2] == 'l':
           #log10 selected
           fileFlag=False
@@ -45,6 +49,7 @@ for arg in sys.argv:
           logFlag=True
           llogFlag=False
           outFlag=False
+          gFlag=False
       elif arg[2] == 'L':
           #log10 selected
           fileFlag=False
@@ -52,6 +57,7 @@ for arg in sys.argv:
           logFlag=False
           llogFlag=True
           outFlag=False
+          gFlag=False
       elif arg[2] == "o":
           #odir sleected
           fileFlag=False
@@ -59,6 +65,14 @@ for arg in sys.argv:
           logFlag=False
           llogFlag=False
           outFlag=True
+          gFlag=False
+      elif arg[2] == "g":
+          fileFlag=False
+          padFlag=False
+          logFlag=False
+          llogFlag=False
+          outFlag=False
+          gFlag=True
     elif arg[1] == 'f':
       #files selected
       fileFlag=True
@@ -66,6 +80,7 @@ for arg in sys.argv:
       logFlag=False
       llogFlag=False
       outFlag=False
+      gFlag=False
   elif fileFlag:
     files.append(arg)
   elif padFlag:
@@ -80,6 +95,9 @@ for arg in sys.argv:
   elif outFlag:
     oDir=arg
     print("setting odir value to " + str(oDir))
+  elif gFlag:
+    geneList=arg
+    print("setting gene list value to " + str(geneList))
 for file in files:
     #a dataframe is made from the deseq csv file. results with no pvalue are cleaved, the first column is named gene ID, and results with padj below < 0.5 are selected for.
     #a dataframe deresultsSig is made from files with a -log10pval above 5, to filter for significant data.
@@ -105,10 +123,21 @@ for file in files:
     volcano.axvline(x=0.0, linestyle="dashed", color="grey",
          linewidth=1)
 
-    #a for loop uses the deresults3 dataframe to annotate the geneIDs of the most significant genes
-    for index, row in deresultsESig.iterrows():
-        volcano.text(row["log2FoldChange"],-1*np.log10(row["pvalue"]),row["gene_id"], horizontalalignment='left', size=10, color='black')
-        print("x: " + str(row["log2FoldChange"]) + ", y: " + str(-1*np.log10(row["pvalue"])) + " , name: " + str(row["gene_id"]))
+    if geneList != "":
+      #first we open the gene list files, then loop the gene list file, and then loop the data frame to find matches
+      f = open(geneList, "r")
+      for x in f:
+        for index, row in deresults.iterrows():
+          if row["gene_id"] == x:
+            volcano.text(row["log2FoldChange"],-1*np.log10(row["pvalue"]),row["gene_id"], horizontalalignment='left', size=10, color='black')
+            print("x: " + str(row["log2FoldChange"]) + ", y: " + str(-1*np.log10(row["pvalue"])) + " , name: " + str(row["gene_id"]))
+    else:
+      #a for loop uses the deresults3 dataframe to annotate the geneIDs of the most significant genes
+      for index, row in deresultsESig.iterrows():
+          volcano.text(row["log2FoldChange"],-1*np.log10(row["pvalue"]),row["gene_id"], horizontalalignment='left', size=10, color='black')
+          print("x: " + str(row["log2FoldChange"]) + ", y: " + str(-1*np.log10(row["pvalue"])) + " , name: " + str(row["gene_id"]))
+    
+    
     
     
     #save the file!
