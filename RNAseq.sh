@@ -29,6 +29,9 @@ threadFlag=0
 threads=0
 qReport=0
 trim=0
+gFlag=0
+gList=0
+geneList=""
 
 rsd=$(pwd) #directory where RNA seq commands are stored, may not be root of fastq reads
 
@@ -79,6 +82,10 @@ do
 	then
 		sFlag=0
 		slr=$var
+	elif [[ $gFlag == 1 ]]
+	then
+		gFlag=0
+		geneList=$var
 	elif [[ "$var" == "-"* ]]
 	then
 		#some flags may have multiple phrases following them so the -option comes first in the else ifs. 
@@ -145,6 +152,11 @@ do
 		if [[ "$var" == "-T"* ]]
 		then
 			trim=1
+		fi
+		if [[ "$var" == "-G"* ]]
+		then
+			gFlag=1
+			gList=1
 		fi
 	elif [[ $pFlag == 1 ]]
 	then
@@ -499,9 +511,17 @@ then
 
 			Rscript DifferentialExpression.R -1 $firstFactorName "${firstFactor[@]/%/.genes.results}" -2 $secondFactorName "${secondFactor[@]/%/.genes.results}" -d "${fqDir}/${oDir}"
 
-			echo "python results.py -f ${fqDir}/${oDir}/${firstFactorName}_vs_${secondFactorName}.csv --padj $padj --log10 $logT --Llog10 $logA --odir ${fqDir}/${oDir}/results"
+			if [[ $gList == 0 ]]
+			then
+				echo "python results.py -f ${fqDir}/${oDir}/${firstFactorName}_vs_${secondFactorName}.csv --padj $padj --log10 $logT --Llog10 $logA --odir ${fqDir}/${oDir}/results"
 
-			python results.py -f "${fqDir}/${oDir}/${firstFactorName}_vs_${secondFactorName}.csv" --padj $padj --log10 $logT --Llog10 $logA --odir "${fqDir}/${oDir}/results"
+				python results.py -f "${fqDir}/${oDir}/${firstFactorName}_vs_${secondFactorName}.csv" --padj $padj --log10 $logT --Llog10 $logA --odir "${fqDir}/${oDir}/results"
+			else
+				echo "python results.py -f ${fqDir}/${oDir}/${firstFactorName}_vs_${secondFactorName}.csv --padj $padj --log10 $logT --Llog10 $logA --odir ${fqDir}/${oDir}/results --g ${geneList}"
+
+				python results.py -f "${fqDir}/${oDir}/${firstFactorName}_vs_${secondFactorName}.csv" --padj $padj --log10 $logT --Llog10 $logA --odir "${fqDir}/${oDir}/results" --g $geneList
+			fi
+			
 		fi
 		
 		if [[ $pca != 0 ]]
