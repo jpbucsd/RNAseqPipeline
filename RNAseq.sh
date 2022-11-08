@@ -176,10 +176,10 @@ then
 
 		for filename in *.fq.gz
 		do
-			if [ ! -f "${filename%.*}.fq" ]
+			if [ ! -f "${filename%.*.*}.fq" ]
 			then
 				echo "unzipping $filename"
-				gzip -dc $filename
+				gzip -dc $filename > "${filename%.*.*}.fq"
 			fi	
 		done
 
@@ -208,10 +208,10 @@ then
 	done
 	for filename in *.fq.gz
 	do
-		if [ ! -f "${filename%.*}.fq" ]
+		if [ ! -f "${filename%.*.*}.fq" ]
 		then
 			echo "unzipping $filename"
-			gzip -dc $filename
+			gzip -dc $filename > "${filename%.*.*}.fq"
 		fi
 	done
 	
@@ -332,10 +332,10 @@ then
 
 		for filename in *.fq.gz
 		do
-			if [ ! -f "${filename%.*}.fq" ]
+			if [ ! -f "${filename%.*.*}.fq" ]
 			then
 				echo "unzipping $filename"
-				gzip -dc $filename
+				gzip -dc $filename > "${filename%.*.*}.fq"
 			fi
 		done
 		it=0
