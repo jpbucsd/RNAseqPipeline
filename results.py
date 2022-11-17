@@ -128,7 +128,7 @@ for file in files:
       f = open(geneList, "r")
       for x in f:
         for index, row in deresults.iterrows():
-          if row["gene_id"] == x:
+          if row["gene_id"].strip() == x.strip():
             volcano.text(row["log2FoldChange"],-1*np.log10(row["pvalue"]),row["gene_id"], horizontalalignment='left', size=10, color='black')
             print("x: " + str(row["log2FoldChange"]) + ", y: " + str(-1*np.log10(row["pvalue"])) + " , name: " + str(row["gene_id"]))
     else:
