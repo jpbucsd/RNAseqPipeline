@@ -466,9 +466,9 @@ then
 		it=0
 		for item in "${parsedArray[@]}"
 		do
-			if [[ it -ge 0 ]]
+			if [[ it -ge 1 ]]
 			then
-				factors[$it]=$item
+				factors[$(expr $it - 1)]=$item
 			fi
 			it=$(expr $it + 1)
 		done
