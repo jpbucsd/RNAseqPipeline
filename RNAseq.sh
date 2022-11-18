@@ -535,4 +535,19 @@ then
 		fi
 	done < tempFile.slr
 	rm tempFile.slr
+	
+	if [[ $analysis != 0 ]]
+	then
+		heat=""
+		cat $slr | grep -n "Comparison:" > tempFile.slr
+		IFS=$'\t' read -r -a parsedArray < tempFile.slr
+		for ELEMENT in ${parsedArray[@]}; do
+			heat+="${ELEMENT} "
+		done
+		rm tempFile.slr
+		#moving into the output directory since heat maps cannot be saved into a specific directory, and just get autosaved to the cd
+		cd ${fqDir}/${oDir}/
+		python heatmap.py -f "${heat}"
+		cd $rsd	
+	fi
 fi
