@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import sys
 import os
-from matplotlib import pyplot as plt
+from bioinfokit import analys, visuz
 
 #usuage, takes CSV files outputed by DifferentialAnalysis.R as arguments
 # python heatmap.py --g genelist.txt (not yet implemented) -f Something_vs_something.csv ... -c (for clustering)
