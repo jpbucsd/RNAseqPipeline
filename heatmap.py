@@ -47,7 +47,6 @@ for file in files:
       
 if hierarchicalFlag:
   visuz.gene_exp.hmap(df=heat, dim=(6, 12), tickfont=(6, 4))
-  os.rename("path/to/current/file.foo", "path/to/new/destination/for/file.foo")
   #saves as heatmap.png heatmap_clus.png
 else:
   visuz.gene_exp.hmap(df=heat, rowclus=False, colclus=False, dim=(6, 12), tickfont=(6, 4))     
