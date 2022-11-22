@@ -547,7 +547,7 @@ then
 		rm tempFile.slr
 		#moving into the output directory since heat maps cannot be saved into a specific directory, and just get autosaved to the cd
 		cd ${fqDir}/${oDir}/
-		python heatmap.py -f "${heat}"
+		${rsd}/python heatmap.py -f "${heat}"
 		cd $rsd	
 	fi
 fi
