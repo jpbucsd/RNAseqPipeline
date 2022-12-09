@@ -41,12 +41,12 @@ for arg in sys.argv:
 heat =  pd.read_csv(files[0])
 
 if gList:
-    lHeat = pd.DataFrame()
+    lHeat = pd.DataFrame(columns = heat.columns)
 
     f = open(geneList, "r")
     for x in f:
       for index, row in heat.iterrows():
-        if row["Gene"].strip() == x.strip():
+        if row[0].strip() == x.strip():
           lHeat.loc[len(lHeat.index)] = row
     heat = lHeat
 
