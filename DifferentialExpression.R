@@ -124,4 +124,7 @@ ofnnname <- paste(firstName,secondName,sep="_vs_")
 ofnname <- paste(dirPath,ofnnname,sep="/")
 ofname <- paste(ofnname,"csv",sep=".")
 write.csv(as.data.frame(res), file=ofname)
-                
+
+#create normalized counts for heatmap
+rlog_out <- assay(rlog(ddsTxi, blind=FALSE)) #normalized count data from the DESeq object
+write.csv(as.data.frame(rlog_out), file="normalizedCounts.csv")                

@@ -6,19 +6,22 @@ from bioinfokit import analys, visuz
 
 #usuage, takes CSV files outputed by DifferentialAnalysis.R as arguments
 # python heatmap.py --g genelist.txt (not yet implemented) -f Something_vs_something.csv ... -c (for clustering)
+print("running")
 fileFlag=False
 hierarchicalFlag=False
 outFlag=False
 gFlag=False
+gList=False
 files=[]
 geneList=""
 for arg in sys.argv:
   if arg[0] == '-':
     if arg[1] == '-':
       if arg[2] == "g":
-          fileFlag=False
-          outFlag=False
-          gFlag=True
+        fileFlag=False
+        outFlag=False
+        gFlag=True
+        gList=True
     elif arg[1] == 'f':
       #files selected
       fileFlag=True
@@ -35,16 +38,20 @@ for arg in sys.argv:
     geneList=arg
     print("setting gene list value to " + str(geneList))
 
-heat = pd.DataFrame()
-tdf =  pd.read_csv(files[0])
-heat['Gene'] = tdf.iloc[:, 0].astype(str)
+heat =  pd.read_csv(files[0])
 
+if gList:
+    lHeat = pd.DataFrame()
 
-for file in files:
-    deresults = pd.read_csv(file)
-    heat[file.replace(".csv","")] = tdf.iloc[:, 2].astype(float)
-      
-      
+    f = open(geneList, "r")
+    for x in f:
+      for index, row in heat.iterrows():
+        if row["Gene"].strip() == x.strip():
+          lHeat.loc[len(lHeat.index)] = row
+    heat = lHeat
+
+heat = heat.set_index(heat.columns[0])
+print(heat)      
 if hierarchicalFlag:
   visuz.gene_exp.hmap(df=heat, dim=(6, 12), tickfont=(6, 4))
   #saves as heatmap.png heatmap_clus.png
