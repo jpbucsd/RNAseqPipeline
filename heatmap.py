@@ -51,6 +51,8 @@ if gList:
     heat = lHeat
 
 heat = heat.set_index(heat.columns[0])
+#if you want to add a chart title, add it inside the string below.
+heat.index.names = ['']
 print(heat)      
 if hierarchicalFlag:
   visuz.gene_exp.hmap(df=heat, dim=(6, 12), tickfont=(6, 4))
