@@ -547,7 +547,9 @@ then
 		rm tempFile.slr
 		#moving into the output directory since heat maps cannot be saved into a specific directory, and just get autosaved to the cd
 		cd ${fqDir}/${oDir}/
-		${rsd}/python heatmap.py -f "${heat}"
+		${rsd}/python heatmap.py -f normalizedCounts.csv 
+		#in the future the following parameters should be added to the heatmap command through command line variables
+		#--g /projects/ps-bryansunlab/labTools/RNAseq/geneListHeatTest.txt -c
 		cd $rsd	
 	fi
 fi
