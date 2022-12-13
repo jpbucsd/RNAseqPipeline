@@ -18,3 +18,21 @@ for index, row in AS.iterrows():
       row['log2FoldChange'] = row2['log2FoldChange']
 
 display(AS)
+AS.to_csv('AS_foldChange.csv')
+
+fig = plt.figure()
+fig.set_size_inches((10,10))
+
+plt.scatter(AS["geneSymbol"], AS['log2FoldChange'],alpha=0.5,color="grey")
+
+ASsmall = AS[AS['log2FoldChange'] < 0.05]
+ASrange = AS[AS['log2FoldChange'] > -0.05]
+
+plt.scatter(ASrange["geneSymbol"],AS["log2FoldChange"],alpha=1,color="black")
+plt.axvline(y = 0.05, color = 'black', label = 'upper bound')
+plt.axvline(y = -0.05, color = 'black', label = 'lower bound')
+
+plt.axvline(x = 0.05, color = 'grey', label = 'x upper bound')
+plt.axvline(x = -0.05, color = 'grey', label = 'x lower bound')
+
+fig.savefig("ASvsFold.png")
