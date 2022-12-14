@@ -25,7 +25,7 @@ This R script performs differential expression analysis with DESEQ2. It produces
 #####    &emsp;-2 (name of second sample set) set2file1.genes.results set2file2.genes.results ... set2fileN.genes.results 
 #####    &emsp;-d <path/to/directory>
 
-# PCA.py
+## PCA.py
 This python script performs principled component analysis on each sample, resulting in a chart where each point represents one sample. This can be used to confirm the efficacy of the experiment by ensuring that experimental samples cluster together and control samples cluster together.
 
 ##### python PCA.py -f <file1.genes.results> <file2.genes.results> ... <fileN.genes.results> 
