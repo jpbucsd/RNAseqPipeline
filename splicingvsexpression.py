@@ -35,4 +35,7 @@ plt.axhline(y = -0.05, color = 'black', label = 'lower bound')
 plt.axvline(x = 0.05, color = 'grey', label = 'x upper bound')
 plt.axvline(x = -0.05, color = 'grey', label = 'x lower bound')
 
+plt.xlabel("IncLevelDifference")
+plt.ylabel("log2FoldChange")
+
 fig.savefig("ASvsFold.png")
