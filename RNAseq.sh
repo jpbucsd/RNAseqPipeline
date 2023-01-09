@@ -32,6 +32,9 @@ trim=0
 gFlag=0
 gList=0
 geneList=""
+HgeneList=""
+hgList=0;
+hgFlag=0;
 
 rsd=$(pwd) #directory where RNA seq commands are stored, may not be root of fastq reads
 
@@ -86,6 +89,10 @@ do
 	then
 		gFlag=0
 		geneList=$var
+	elif [[ $hgFlag == 1 ]]
+	then
+		hgFlag=0
+		HgeneList=$var
 	elif [[ "$var" == "-"* ]]
 	then
 		#some flags may have multiple phrases following them so the -option comes first in the else ifs. 
@@ -157,6 +164,11 @@ do
 		then
 			gFlag=1
 			gList=1
+		fi
+		if [[ "$var" == "-H"* ]]
+		then
+			hgFlag=1
+			hgList=1
 		fi
 	elif [[ $pFlag == 1 ]]
 	then
@@ -547,7 +559,21 @@ then
 		rm tempFile.slr
 		#moving into the output directory since heat maps cannot be saved into a specific directory, and just get autosaved to the cd
 		cd ${fqDir}/${oDir}/
-		${rsd}/python heatmap.py -f normalizedCounts.csv 
+		
+		if [[ $hgList == 0 ]]
+		then
+			echo "python ${rsd}/heatmap.py -f normalizedCounts.csv"
+		
+			$python {rsd}/heatmap.py -f normalizedCounts.csv
+			
+		else
+			echo "python ${rsd}/heatmap.py -f normalizedCounts.csv --g ${HgeneList}"
+		
+			python ${rsd}/heatmap.py -f normalizedCounts.csv --g $HgeneList
+			
+		fi
+		
+		 
 		#in the future the following parameters should be added to the heatmap command through command line variables
 		#--g /projects/ps-bryansunlab/labTools/RNAseq/geneListHeatTest.txt -c
 		cd $rsd	
