@@ -102,9 +102,9 @@ imgName=""
 if(oDir == ""):
   if not os.path.exists(oDir +  "figures/pca"):
       os.makedirs(oDir +  "figures/pca")
-  imgName= 'figures/pca/PCA.png'
+  imgName= 'figures/pca/PCA.eps'
 else:
   if not os.path.exists(oDir +  "/figures/pca/"):
       os.makedirs(oDir +  "/figures/pca/")
-  imgName= oDir + '/figures/pca/PCA.png'
-ax1.figure.savefig(imgName)
+  imgName= oDir + '/figures/pca/PCA.eps'
+ax1.figure.savefig(imgName,format='eps')
