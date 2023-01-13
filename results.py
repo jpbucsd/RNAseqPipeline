@@ -152,7 +152,7 @@ for file in files:
     if not os.path.exists(oDir + "/" + figName):
       os.makedirs(oDir  + "/" + figName)
     
-    fig.savefig(oDir + "/" + figName + "/" + figName + ".png")
+    fig.savefig(oDir + "/" + figName + "/" + figName + ".eps",format='eps')
     
     
     #remove values that are likely false positives, I am unsure if this step should be done after graphing or not, for now it will be
