@@ -573,6 +573,9 @@ then
 			
 		fi
 		
+		#the heatmap wont save to the correct place, we must move it
+		echo "mv ${rsd}/heatmap.eps ${fqDir}/${oDir}/heatmap.eps"
+		mv ${rsd}/heatmap.eps ${fqDir}/${oDir}/heatmap.eps
 		 
 		#in the future the following parameters should be added to the heatmap command through command line variables
 		#--g /projects/ps-bryansunlab/labTools/RNAseq/geneListHeatTest.txt -c
