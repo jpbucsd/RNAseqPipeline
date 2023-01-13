@@ -55,7 +55,7 @@ heat = heat.set_index(heat.columns[0])
 heat.index.names = ['']
 print(heat)      
 if hierarchicalFlag:
-  visuz.gene_exp.hmap(df=heat, dim=(6, 12), tickfont=(6, 4))
-  #saves as heatmap.png heatmap_clus.png
+  visuz.gene_exp.hmap(df=heat, dim=(6, 12), tickfont=(6, 4),figtype='eps')
+  #saves as heatmap.png heatmap_clus.eps
 else:
-  visuz.gene_exp.hmap(df=heat, rowclus=False, colclus=False, dim=(6, 12), tickfont=(6, 4))     
+  visuz.gene_exp.hmap(df=heat, rowclus=False, colclus=False, dim=(6, 12), tickfont=(6, 4),figtype='eps')     
