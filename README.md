@@ -1,5 +1,5 @@
 # RNAseqPipeline
-This pipeline performs all steps of RNA sequencing. It was designed specifically for use at the Bryan Sun Lab at the University of California, San Diego's School of Medicine. It is hosted in the SDSC TSCC super computer, where a graphics user interface on the users personal computer sends tasks to the super computer that execute the scripts in this repository. Code for the GUI is not included in this repository.
+This pipeline performs all steps of RNA sequencing. It was designed specifically for use at the Bryan Sun Lab at the University of California, San Diego's School of Medicine. It is hosted in the SDSC TSCC super computer, where a graphics user interface on the users personal computer sends tasks to the super computer that execute the scripts in this repository. Code for the GUI is not included in this repository. See <a href="https://github.com/jpbucsd/GUI-RNAseq-pipeline">https://github.com/jpbucsd/GUI-RNAseq-pipeline</a> for the GUI.
 
 Usage of the commands in this repository that are automated by the GUI are as follows:
 
