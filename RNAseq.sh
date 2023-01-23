@@ -494,26 +494,71 @@ then
 	do
 		factor1="${parsedArray[1]}"
 		factor2="${parsedArray[2]}"
-
+		factor3="${parsedArray[3]}"
+		factor4="${parsedArray[4]}"
+		#compare factor 1 vs 2 for samples in factor 3 and 4
+		#will we include a 3rd and 4th factor? if they are -1 we do not use them
+		
 		firstFactor[0]=""
 		it=0
+		#If we want to do factor1 vs factor2 only within samples that have factor3, we want to add factor 3 in the grep statement below, or a double grep
 		cat $slr | grep -n "~${factor1}" > stempFile.slr
+		if [[ $factor3 != -1 ]]
+		then
+			#make stempfile13 contain only those in factor1 and factor3
+			cat $stempFile.slr | grep -n "~${factor3}" > stempFile13.slr
+		else
+			#if we dont use factor3, lets put all of stemfile.slr into stempfile13
+			cat $stempFile.slr > stempFile13.slr
+		fi
+		if [[ $factor4 != -1 ]]
+		then
+			#make stempfile14 contain only those in factor1 and factor 3 and factor4
+			cat $stempFile13.slr | grep -n "~${factor4}" > stempFile14.slr
+		else
+			#if we dont use factor4, lets put all of stempfile13.slr into stempfile14
+			cat $stempFile13.slr > stempFile14.slr
+		fi
+		
+		
+		
 		while IFS=$'\t' read -r -a sparsedArray
 		do
 			firstFactor[$it]=${sparsedArray[1]}
 			it=$(expr $it + 1)
-		done < stempFile.slr
+		done < stempFile14.slr
 		rm stempFile.slr
+		rm stempFile13.slr
+		rm stempFile14.slr
 
 		secondFactor[0]=""
 		it=0
 		cat $slr | grep -n "~${factor2}" > stempFile.slr
+		if [[ $factor3 != -1 ]]
+		then
+			#make stempfile13 contain only those in factor1 and factor3
+			cat $stempFile.slr | grep -n "~${factor3}" > stempFile23.slr
+		else
+			#if we dont use factor3, lets put all of stemfile.slr into stempfile23
+			cat $stempFile.slr > stempFile23.slr
+		fi
+		if [[ $factor4 != -1 ]]
+		then
+			#make stempfile24 contain only those in factor1 and factor 3 and factor4
+			cat $stempFile23.slr | grep -n "~${factor4}" > stempFile24.slr
+		else
+			#if we dont use factor4, lets put all of stempfile13.slr into stempfile14
+			cat $stempFile23.slr > stempFile24.slr
+		fi
+		
 		while IFS=$'\t' read -r -a sparsedArray
 		do
 			secondFactor[$it]=${sparsedArray[1]}
 			it=$(expr $it + 1)
-		done < stempFile.slr
+		done < stempFile24.slr
 		rm stempFile.slr
+		rm stempFile23.slr
+		rm stempFile24.slr
 
 		if [[ $analysis != 0 ]]
 		then
