@@ -492,6 +492,19 @@ then
 	cat $slr | grep -n "Comparison:" > tempFile.slr
 	while IFS=$'\t' read -r -a parsedArray
 	do
+		#the first element in this array will be a string, of which each index determines the type of parameter in the rest of the string
+		#1 represents the value for comparison 1, 2 represents the value for comparison 2
+		#A represents a parameter that is unioned with the parameter denoted by 1. therefore either 1 or A will be compared against 2
+		#B represents a parameter that is unioned with the parameter denoted by 2. therefore 1  will be compared against 2 or B
+		#c represents a parameter that is intersected with 1. Therefore samples within C and 1 will be compared against 2
+		#D represents a paraemter that is intersected with 2, therefore samples within D and 2 will be compared against 1
+		determinant="${parsedArray[1]}";
+		for (( s=0; s<${#determinant}; s++ )); do
+  			#add to lists of union comparison one and intersect comparison 1. and also for 2. 
+			#TODO
+			#then for the union, grep from stepfile twice into stempfile13
+			#for intersection grep from stepfile13 into 23
+		done
 		factor1="${parsedArray[1]}"
 		factor2="${parsedArray[2]}"
 		factor3="${parsedArray[3]}"
