@@ -191,10 +191,10 @@ done
 if [[ $qReport != 0 ]]
 then
 		cd "$fqDir"
-		for filename in *.fastq.gz
-		do
+		#for filename in *.fastq.gz
+		#do
 			#mv $filename ${filename%.fastq.gz}.fq.gz
-		done
+		#done
 		
 		
 
@@ -226,10 +226,10 @@ then
 	#${pair1}
 	
 	cd "$fqDir"
-	for filename in *.fastq.gz
-	do
+	#for filename in *.fastq.gz
+	#do
 		#mv $filename ${filename%.fastq.gz}.fq.gz
-	done
+	#done
 	for filename in *.fq.gz
 	do
 		if [ ! -f "${filename%.*.*}.fq" ]
@@ -275,22 +275,22 @@ then
 		mkdir refGen
 	fi
 	cd refGen
-	if ! [ -f GCF_000001405.40_GRCh38.p14_genomic.fna ]
-	then
-		if ! [ -f GCF_000001405.40_GRCh38.p14_genomic.fna.gz ]
-		then
+	#if ! [ -f GCF_000001405.40_GRCh38.p14_genomic.fna ]
+	#then
+		#if ! [ -f GCF_000001405.40_GRCh38.p14_genomic.fna.gz ]
+		#then
 			#wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_genomic.fna.gz
-		fi
+		#fi
 		#gzip -d GCF_000001405.40_GRCh38.p14_genomic.fna.gz
-	fi
-	if ! [ -f GCF_000001405.40_GRCh38.p14_genomic.gtf ]
-	then
-		if ! [ -f GCF_000001405.40_GRCh38.p14_genomic.gtf.gz ]
-		then
-			#wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_genomic.gtf.gz
-		fi
+	#fi
+	#if ! [ -f GCF_000001405.40_GRCh38.p14_genomic.gtf ]
+	#then
+		#if ! [ -f GCF_000001405.40_GRCh38.p14_genomic.gtf.gz ]
+		#then
+		#	#wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_genomic.gtf.gz
+		#fi
 		#gzip -d GCF_000001405.40_GRCh38.p14_genomic.gtf.gz
-	fi
+	#fi
 
 	if [ -d "genome$readLength" ] 
 	then
@@ -329,10 +329,10 @@ then
 		#we must produce an RSEM index to use RSEM for quantitative analysis later. This step runs extremely quickly compared to STAR's indexing, and finishes easily on a regular computer
 		echo "genome has not yet been indexed with RSEM, indexing..."
 
-		if ! [ -f GCF_000001405.40_GRCh38.p14_genomic.fa ]
-		then
+		#if ! [ -f GCF_000001405.40_GRCh38.p14_genomic.fa ]
+		#then
 			#cp GCF_000001405.40_GRCh38.p14_genomic.fna GCF_000001405.40_GRCh38.p14_genomic.fa
-		fi
+		#fi
 		#rsem-prepare-reference --gtf GCF_000001405.40_GRCh38.p14_genomic.gtf --num-threads $threads GCF_000001405.40_GRCh38.p14_genomic.fa GCF_000001405.40_GRCh38.p14_genomic
 	fi
 
@@ -349,10 +349,10 @@ then
 	if [[ $paired == 1 ]]
 	then
 		cd "$fqDir"
-		for filename in *.fastq.gz
-		do
+		#for filename in *.fastq.gz
+		#do
 			#mv $filename ${filename%.fastq.gz}.fq.gz
-		done
+		#done
 
 		for filename in *.fq.gz
 		do
