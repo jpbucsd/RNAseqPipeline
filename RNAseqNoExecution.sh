@@ -559,6 +559,7 @@ then
 		do
 			firstFactor[$it]=${sparsedArray[1]}
 			it=$(expr $it + 1)
+			echo firstFactor[$it]
 		done < stempFile1.slr
 		rm stempFile1.slr
 		rm stempFile11.slr
@@ -570,6 +571,7 @@ then
 		do
 			secondFactor[$it]=${sparsedArray[1]}
 			it=$(expr $it + 1)
+			echo secondFactor[$it]
 		done < stempFile2.slr
 		rm stempFile2.slr
 		rm stempFile22.slr
