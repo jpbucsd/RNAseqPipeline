@@ -540,14 +540,14 @@ then
 		for i in "${c1intersect[@]}"
 		do
 		   cat $stempFile1 | grep -n "~$i}" > stempFile11.slr
-		   cat $stempFile11.slr > stempFile1
+		   cat $stempFile11.slr > stempFile1.slr
 		done
 		
 		#intersection on 2
 		for i in "${c2intersect[@]}"
 		do
 		   cat $stempFile2 | grep -n "~$i}" > stempFile22.slr
-		   cat $stempFile22.slr > stempFile2
+		   cat $stempFile22.slr > stempFile2.slr
 		done
 		
 		#collect the samples after unions and intersections
@@ -576,8 +576,8 @@ then
 
 		if [[ $analysis != 0 ]]
 		then
-			firstFactorName=${factors[$(($factor1))]}
-			secondFactorName=${factors[$(($factor2))]}
+			firstFactorName=${factors[$((${parsedArray[1]}))]}
+			secondFactorName=${factors[$((${parsedArray[2]}))]}
 			echo "Rscript DifferentialExpression.R -1 $firstFactorName ${firstFactor[@]/%/.genes.results} -2 $secondFactorName ${secondFactor[@]/%/.genes.results} -d ${fqDir}/${oDir}"
 
 			#Rscript DifferentialExpression.R -1 $firstFactorName "${firstFactor[@]/%/.genes.results}" -2 $secondFactorName "${secondFactor[@]/%/.genes.results}" -d "${fqDir}/${oDir}"
