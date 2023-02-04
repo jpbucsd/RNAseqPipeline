@@ -505,50 +505,91 @@ then
 		c2intersect=();
 		for (( s=2; s<${#determinant}; s++ )); do
 			#we want to skip the first two letters, they will always be 1 and 2
-			echo "${determinant:$s:1}"
+			echo "determinant: ${determinant:$s:1}"
 			if [ "${determinant:$s:1}" == "A" ]
 			then
-				c1union+=${parsedArray[$((s+2))]};
+				echo "adding A ${parsedArray[$((s+2))]}"
+				c1union+=(${parsedArray[$((s+2))]});
 			elif [ "${determinant:$s:1}" == "B" ]
 			then
-				c2union+=${parsedArray[$((s+2))]};
+				echo "Adding B ${parsedArray[$((s+2))]}"
+				c2union+=(${parsedArray[$((s+2))]});
 			elif [ "${determinant:$s:1}" == "C" ]
 			then
-				c1intersect+=${parsedArray[$((s+2))]};
+				echo "Adding C ${parsedArray[$((s+2))]}"
+				c1intersect+=(${parsedArray[$((s+2))]});
 			elif [ "${determinant:$s:1}" == "D" ]
 			then
-				c2intersect+=${parsedArray[$((s+2))]};
+				echo "Adding D ${parsedArray[$((s+2))]}"
+				c2intersect+=(${parsedArray[$((s+2))]});
+			else
+				echo "${determinant:$s:1} ${parsedArray[$((s+2))]}"
 			fi
   			#add to lists of union comparison one and intersect comparison 1. and also for 2. 
 			#then for the union, grep from stepfile twice into stempfile13
 			#for intersection grep from stepfile13 into 23
 		done
+		
+		echo "" > stempFile1.slr
+		echo "" > stempFile2.slr
+		echo "" > stempFile11.slr
+		echo "" > stempFile22.slr
 
+
+		echo "c1union"
+		echo "${c1union[@]}"
+
+		echo "c2union"
+                echo "${c2union[@]}"
+
+		echo "c1intersect"
+                echo "${c1intersect[@]}"
+
+		echo "c2intersect"
+                echo "${c2intersect[@]}"
 		#union on 1
+		cat $slr
 		for i in "${c1union[@]}"
 		do
-		   cat $slr | grep -n "~$i}" >> stempFile1.slr
+		   cat $slr | grep -n "~$i" >> stempFile1.slr
+		   cat $slr | grep -n "~$i"
 		done
 		
 		#union on 2
 		for i in "${c2union[@]}"
 		do
-		   cat $slr | grep -n "~$i}" >> stempFile2.slr
+		   cat $slr | grep -n "~$i" >> stempFile2.slr
+	 	   echo "in c2 union: ~$i"
+                   cat $slr | grep -n "~$i"
 		done
 		
+		echo "stemps after union"
+		cat stempFile1.slr
+		echo " "
+		cat stempFile2.slr
+
 		#intersection on 1
 		for i in "${c1intersect[@]}"
 		do
-		   cat stempFile1 | grep -n "~$i}" > stempFile11.slr
+		   cat stempFile1.slr | grep -n "~$i" > stempFile11.slr
+		   echo "inteserction $i"
+	           cat stempFile1.slr | grep -n "~$i"
 		   cat stempFile11.slr > stempFile1.slr
 		done
 		
 		#intersection on 2
 		for i in "${c2intersect[@]}"
 		do
-		   cat stempFile2 | grep -n "~$i}" > stempFile22.slr
+		   cat stempFile2.slr | grep -n "~$i" > stempFile22.slr
+		   echo "intersection $i"
+		   cat stempFile1.slr | grep -n "~$i"
 		   cat stempFile22.slr > stempFile2.slr
 		done
+		
+		echo "stemps after intersection"
+                cat stempFile1.slr
+                echo " "
+                cat stempFile2.slr
 		
 		#collect the samples after unions and intersections
 		
