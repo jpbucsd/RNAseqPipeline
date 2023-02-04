@@ -506,16 +506,16 @@ then
 		for (( s=2; s<${#determinant}; s++ )); do
 			#we want to skip the first two letters, they will always be 1 and 2
 			echo "${determinant:$s:1}"
-			if ["${determinant:$s:1}" == "A"]
+			if [[ "${determinant:$s:1}" == "A" ]]
 			then
 				c1union+=${parsedArray[$((s+1))]};
-			elif ["${determinant:$s:1}" == "B"]
+			elif [[ "${determinant:$s:1}" == "B" ]]
 			then
 				c2union+=${parsedArray[$((s+1))]};
-			elif ["${determinant:$s:1}" == "C"]
+			elif [[ "${determinant:$s:1}" == "C" ]]
 			then
 				c1intersect+=${parsedArray[$((s+1))]};
-			elif ["${determinant:$s:1}" == "D"]
+			elif [[ "${determinant:$s:1}" == "D" ]]
 			then
 				c2intersect+=${parsedArray[$((s+1))]};
 			fi
