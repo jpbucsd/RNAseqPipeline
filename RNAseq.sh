@@ -499,8 +499,8 @@ then
 		#c represents a parameter that is intersected with 1. Therefore samples within C and 1 will be compared against 2
 		#D represents a paraemter that is intersected with 2, therefore samples within D and 2 will be compared against 1
 		determinant="${parsedArray[1]}";
-		c1union=(${parsedArray[1]});
-		c2union=(${parsedArray[2]});
+		c1union=(${parsedArray[2]});
+		c2union=(${parsedArray[3]});
 		c1intersect=();
 		c2intersect=();
 		for (( s=2; s<${#determinant}; s++ )); do
@@ -508,16 +508,16 @@ then
 			echo "${determinant:$s:1}"
 			if [ "${determinant:$s:1}" == "A" ]
 			then
-				c1union+=${parsedArray[$((s+1))]};
+				c1union+=${parsedArray[$((s+2))]};
 			elif [ "${determinant:$s:1}" == "B" ]
 			then
-				c2union+=${parsedArray[$((s+1))]};
+				c2union+=${parsedArray[$((s+2))]};
 			elif [ "${determinant:$s:1}" == "C" ]
 			then
-				c1intersect+=${parsedArray[$((s+1))]};
+				c1intersect+=${parsedArray[$((s+2))]};
 			elif [ "${determinant:$s:1}" == "D" ]
 			then
-				c2intersect+=${parsedArray[$((s+1))]};
+				c2intersect+=${parsedArray[$((s+2))]};
 			fi
   			#add to lists of union comparison one and intersect comparison 1. and also for 2. 
 			#then for the union, grep from stepfile twice into stempfile13
@@ -539,15 +539,15 @@ then
 		#intersection on 1
 		for i in "${c1intersect[@]}"
 		do
-		   cat $stempFile1 | grep -n "~$i}" > stempFile11.slr
-		   cat $stempFile11.slr > stempFile1
+		   cat stempFile1 | grep -n "~$i}" > stempFile11.slr
+		   cat stempFile11.slr > stempFile1.slr
 		done
 		
 		#intersection on 2
 		for i in "${c2intersect[@]}"
 		do
-		   cat $stempFile2 | grep -n "~$i}" > stempFile22.slr
-		   cat $stempFile22.slr > stempFile2
+		   cat stempFile2 | grep -n "~$i}" > stempFile22.slr
+		   cat stempFile22.slr > stempFile2.slr
 		done
 		
 		#collect the samples after unions and intersections
@@ -559,6 +559,7 @@ then
 		do
 			firstFactor[$it]=${sparsedArray[1]}
 			it=$(expr $it + 1)
+			echo firstFactor[$it]
 		done < stempFile1.slr
 		rm stempFile1.slr
 		rm stempFile11.slr
@@ -570,14 +571,15 @@ then
 		do
 			secondFactor[$it]=${sparsedArray[1]}
 			it=$(expr $it + 1)
+			echo secondFactor[$it]
 		done < stempFile2.slr
 		rm stempFile2.slr
 		rm stempFile22.slr
 
 		if [[ $analysis != 0 ]]
 		then
-			firstFactorName=${factors[$(($factor1))]}
-			secondFactorName=${factors[$(($factor2))]}
+			firstFactorName=${factors[$((${parsedArray[2]}))]}
+			secondFactorName=${factors[$((${parsedArray[3]}))]}
 			echo "Rscript DifferentialExpression.R -1 $firstFactorName ${firstFactor[@]/%/.genes.results} -2 $secondFactorName ${secondFactor[@]/%/.genes.results} -d ${fqDir}/${oDir}"
 
 			Rscript DifferentialExpression.R -1 $firstFactorName "${firstFactor[@]/%/.genes.results}" -2 $secondFactorName "${secondFactor[@]/%/.genes.results}" -d "${fqDir}/${oDir}"
