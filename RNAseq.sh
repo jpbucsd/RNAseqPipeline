@@ -499,24 +499,27 @@ then
 		#c represents a parameter that is intersected with 1. Therefore samples within C and 1 will be compared against 2
 		#D represents a paraemter that is intersected with 2, therefore samples within D and 2 will be compared against 1
 		determinant="${parsedArray[1]}";
-		c1union=(${parsedArray[2]});
-		c2union=(${parsedArray[3]});
+		firstFactorName=(${parsedArray[2]});
+		secondFactorName=(${parsedArray[3]});
+		c1union=(${parsedArray[4]});
+		c2union=(${parsedArray[5]});
 		c1intersect=();
 		c2intersect=();
 		for (( s=2; s<${#determinant}; s++ )); do
 			#we want to skip the first two letters, they will always be 1 and 2
+			#and we want to skip the first 5 elements in the parsed array.  index 1 has the determinant, index 2 and 3 have axis names, index 4 and 5 have c1 and c2 which are already added.
 			if [ "${determinant:$s:1}" == "A" ]
 			then
-				c1union+=(${parsedArray[$((s+2))]});
+				c1union+=(${parsedArray[$((s+4))]});
 			elif [ "${determinant:$s:1}" == "B" ]
 			then
-				c2union+=(${parsedArray[$((s+2))]});
+				c2union+=(${parsedArray[$((s+4))]});
 			elif [ "${determinant:$s:1}" == "C" ]
 			then
-				c1intersect+=(${parsedArray[$((s+2))]});
+				c1intersect+=(${parsedArray[$((s+4))]});
 			elif [ "${determinant:$s:1}" == "D" ]
 			then
-				c2intersect+=(${parsedArray[$((s+2))]});
+				c2intersect+=(${parsedArray[$((s+4))]});
 			fi
   			#add to lists of union comparison one and intersect comparison 1. and also for 2. 
 			#then for the union, grep from stepfile twice into stempfile13
@@ -582,8 +585,7 @@ then
 
 		if [[ $analysis != 0 ]]
 		then
-			firstFactorName=${factors[$((${parsedArray[2]}))]}
-			secondFactorName=${factors[$((${parsedArray[3]}))]}
+			
 			echo "Rscript DifferentialExpression.R -1 $firstFactorName ${firstFactor[@]/%/.genes.results} -2 $secondFactorName ${secondFactor[@]/%/.genes.results} -d ${fqDir}/${oDir}"
 
 			Rscript DifferentialExpression.R -1 $firstFactorName "${firstFactor[@]/%/.genes.results}" -2 $secondFactorName "${secondFactor[@]/%/.genes.results}" -d "${fqDir}/${oDir}"
