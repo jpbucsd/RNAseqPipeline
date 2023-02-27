@@ -1,0 +1,149 @@
+library("DESeq2")
+library("tximport")
+
+#parse command line arguments
+#command line usage 1:
+
+#Rscript Heatmap.R -Z zeroSet zerofile1.genes.results zerofile2.genes.results ... zerofileN.genes.results -S setN setNfile1.genes.results ... setNfile2.genes.results 
+
+zeroName <- ""
+zeroFiles <- c()
+setNames <- c()
+setFile <- c()
+setFiles <- list()
+
+
+args <- commandArgs(trailingOnly = TRUE)
+zeroSet <- FALSE
+otherSets <- FALSE
+directory <- FALSE
+dirPath <- ""
+named <- FALSE
+
+indexZ <- 0
+indexS <- c()
+cIndex <- 0
+setIndex <- 0
+
+
+for (arg in args) {
+    if(substring(arg, first = 1, last = 1) == "-")
+    {
+          if(otherSets)
+          {
+            #other sets was previously set, finish it up
+            indexS[setIndex] = cIndex
+            setFiles.append(setFile)
+            setFile = c()
+            cIndex = 0
+          }
+          if (substring(arg, first = 1, last = 2) == "-Z")
+          {
+            zeroSet = TRUE
+            otherSets = FALSE
+            directory = FALSE
+            named = FALSE
+            #reset the index
+            index = 0
+          } else if (substring(arg, first = 1, last = 2) == "-S") {
+            #assume it is -2
+            #reset the index
+            index = 0
+            zeroSet = FALSE
+            otherSets = TRUE
+            directory = FALSE
+            named = FALSE
+          } else if (substring(arg, first = 1, last = 2) == "-d") {
+            #assume it is -2
+            zeroSet = FALSE
+            otherSets = FALSE
+            directory = TRUE
+          }
+    } else {
+          if ( zeroSet )
+          {
+             if ( !named )
+             {
+                  zeroName = arg
+                  named = TRUE
+             } else {
+                  indexZ = indexZ + 1
+                  zeroFiles[indexZ] = arg
+             }
+          } else if (otherSets) {
+            #assume second
+            if ( !named )
+            {
+                  #add the last setFile to setFiles and reset it so that we can start a new one
+                  
+                  setIndex = setIndex + 1
+                  setNames[setIndex] = arg
+                  named = TRUE
+             } else {
+                  
+                  cIndex = cIndex + 1
+                  setFile[cIndex] = arg
+             }
+          } else if (directory)
+          {
+              dirPath = arg
+          }
+     
+    }
+ }
+ #the last set file is not added yet
+ setFiles.append(setFile)
+ indexS[setIndex] = cIndex
+ setFiles.append(setFile)
+
+ 
+loopIndex <- 0
+for (set in setFiles) {
+  #create conditions
+  loopIndex = loopIndex + 1
+  conditions <- c(rep(zeroName,indexZ),rep(setNames[loopIndex],indexS[loopIndex]))
+  
+  #resume converting from below
+  
+
+}
+
+
+files <- c()
+snames <- c()
+for (file in files1) {
+    snames <- append(snames, substring(file, first = 0, last = nchar(file) - 14))
+    fname <- paste(dirPath,file,sep="/")
+    files <- append(files,fname)
+}
+for (file in files2) {
+    snames <- append(snames, substring(file, first = 0, last = nchar(file) - 14))
+    fname <- paste(dirPath,file,sep="/")
+    files <- append(files,fname)
+}
+samples <- data.frame("run"=snames,"condition"=conditions)
+names(files) = samples$run
+
+#convert RSEM results
+txi <- tximport(files, type = "rsem")
+txi$length[txi$length == 0] <- 1
+ddsTxi <- DESeqDataSetFromTximport(txi,colData = samples, design = ~ condition)
+
+#filtering, filter low counts to ignore them
+keep <- rowSums(counts(ddsTxi)) >= 10
+ddsTxi <- ddsTxi[keep,]
+
+##### Perform deseq2 #####
+ddsTxi <- DESeq(ddsTxi)
+res <- results(ddsTxi)
+res
+
+#write results
+ofnnname <- paste(firstName,secondName,sep="_vs_")
+ofnname <- paste(dirPath,ofnnname,sep="/")
+ofname <- paste(ofnname,"csv",sep=".")
+write.csv(as.data.frame(res), file=ofname)
+
+#create normalized counts for heatmap
+rlog_out <- assay(rlog(ddsTxi, blind=FALSE)) #normalized count data from the DESeq object
+write.csv(as.data.frame(rlog_out), file="normalizedCounts.csv")        
