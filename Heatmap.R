@@ -99,6 +99,9 @@ for (arg in args) {
  
 loopIndex <- 0
 
+rlogSet <- c()
+resultsSet <- c()
+
 #we actually want to compare the zeroset to itself to make it come out zero in the heatmap
 if(TRUE){
   #create conditions
@@ -136,6 +139,8 @@ if(TRUE){
   ##### Perform deseq2 #####
   ddsTxi <- DESeq(ddsTxi)
   res <- results(ddsTxi)
+    
+  resultsSet <- append(resultsSet,res)
   
   #res contains the results for this one
   #write results
@@ -147,6 +152,9 @@ if(TRUE){
 
   #create normalized counts for heatmap
   rlog_out <- assay(rlog(ddsTxi, blind=FALSE)) #normalized count data from the DESeq object
+    
+  rlogSet <- append(rlogSet,rlog_out)  
+  
   nomnnnnname <- paste(zeroName,zeroName,sep="_vs_")
   nomnnnname <- paste(nomnnnnname,"normalizedCounts",sep="_")
   nomnnname <- paste("control",nomnnnname,sep="/")
@@ -192,6 +200,8 @@ for (set in setFiles) {
   ##### Perform deseq2 #####
   ddsTxi <- DESeq(ddsTxi)
   res <- results(ddsTxi)
+    
+  resultsSet <- append(resultsSet,res)
   
   #res contains the results for this one
   #write results
@@ -203,6 +213,9 @@ for (set in setFiles) {
 
   #create normalized counts for heatmap
   rlog_out <- assay(rlog(ddsTxi, blind=FALSE)) #normalized count data from the DESeq object
+  
+  rlogSet <- append(rlogSet,rlog_out)  
+  
   nomnnnnname <- paste(zeroName,zeroName,sep="_vs_")
   nomnnnname <- paste(nomnnnnname,"normalizedCounts",sep="_")
   nomnnname <- paste("control",nomnnnname,sep="/")
