@@ -98,52 +98,117 @@ for (arg in args) {
 
  
 loopIndex <- 0
+
+#we actually want to compare the zeroset to itself to make it come out zero in the heatmap
+if(TRUE){
+  #create conditions
+  loopIndex = loopIndex + 1
+  conditions <- c(rep(zeroName,indexZ),rep(zeroName,indexZ))
+  #resume converting from below
+  files <- c()
+  snames <- c()
+    
+    
+  #zero set first
+  for (file in zeroFiles) {
+      snames <- append(snames, substring(file, first = 0, last = nchar(file) - 14))
+      fname <- paste(dirPath,file,sep="/")
+      files <- append(files,fname)
+  }
+  for (file in zeroFiles) {
+      snames <- append(snames, substring(file, first = 0, last = nchar(file) - 14))
+      fname <- paste(dirPath,file,sep="/")
+      files <- append(files,fname)
+  }
+    
+  samples <- data.frame("run"=snames,"condition"=conditions)
+  names(files) = samples$run
+
+  #convert RSEM results
+  txi <- tximport(files, type = "rsem")
+  txi$length[txi$length == 0] <- 1
+  ddsTxi <- DESeqDataSetFromTximport(txi,colData = samples, design = ~ condition)
+
+  #filtering, filter low counts to ignore them
+  keep <- rowSums(counts(ddsTxi)) >= 10
+  ddsTxi <- ddsTxi[keep,]
+
+  ##### Perform deseq2 #####
+  ddsTxi <- DESeq(ddsTxi)
+  res <- results(ddsTxi)
+  
+  #res contains the results for this one
+  #write results
+  ofnnnname <- paste(zeroName,zeroName,sep="_vs_")
+  ofnnname <- paste("control",ofnnnname,sep="/")
+  ofnname <- paste(dirPath,ofnnname,sep="/")
+  ofname <- paste(ofnname,"csv",sep=".")
+  write.csv(as.data.frame(res), file=ofname)
+
+  #create normalized counts for heatmap
+  rlog_out <- assay(rlog(ddsTxi, blind=FALSE)) #normalized count data from the DESeq object
+  nomnnnnname <- paste(zeroName,zeroName,sep="_vs_")
+  nomnnnname <- paste(nomnnnnname,"normalizedCounts",sep="_")
+  nomnnname <- paste("control",nomnnnname,sep="/")
+  nomnname <- paste(dirPath,nomnnname,sep="/")
+  nomname <- paste(nomnname,"csv",sep=".")
+  write.csv(as.data.frame(rlog_out), file=nomname)   
+  
+}
+
 for (set in setFiles) {
   #create conditions
   loopIndex = loopIndex + 1
   conditions <- c(rep(zeroName,indexZ),rep(setNames[loopIndex],indexS[loopIndex]))
-  
   #resume converting from below
+  files <- c()
+  snames <- c()
+    
+    
+  #zero set first
+  for (file in zeroFiles) {
+      snames <- append(snames, substring(file, first = 0, last = nchar(file) - 14))
+      fname <- paste(dirPath,file,sep="/")
+      files <- append(files,fname)
+  }
+  for (file in set) {
+      snames <- append(snames, substring(file, first = 0, last = nchar(file) - 14))
+      fname <- paste(dirPath,file,sep="/")
+      files <- append(files,fname)
+  }
+    
+  samples <- data.frame("run"=snames,"condition"=conditions)
+  names(files) = samples$run
+
+  #convert RSEM results
+  txi <- tximport(files, type = "rsem")
+  txi$length[txi$length == 0] <- 1
+  ddsTxi <- DESeqDataSetFromTximport(txi,colData = samples, design = ~ condition)
+
+  #filtering, filter low counts to ignore them
+  keep <- rowSums(counts(ddsTxi)) >= 10
+  ddsTxi <- ddsTxi[keep,]
+
+  ##### Perform deseq2 #####
+  ddsTxi <- DESeq(ddsTxi)
+  res <- results(ddsTxi)
   
+  #res contains the results for this one
+  #write results
+  ofnnnname <- paste(zeroName,zeroName,sep="_vs_")
+  ofnnname <- paste("control",ofnnnname,sep="/")
+  ofnname <- paste(dirPath,ofnnname,sep="/")
+  ofname <- paste(ofnname,"csv",sep=".")
+  write.csv(as.data.frame(res), file=ofname)
 
+  #create normalized counts for heatmap
+  rlog_out <- assay(rlog(ddsTxi, blind=FALSE)) #normalized count data from the DESeq object
+  nomnnnnname <- paste(zeroName,zeroName,sep="_vs_")
+  nomnnnname <- paste(nomnnnnname,"normalizedCounts",sep="_")
+  nomnnname <- paste("control",nomnnnname,sep="/")
+  nomnname <- paste(dirPath,nomnnname,sep="/")
+  nomname <- paste(nomnname,"csv",sep=".")
+  write.csv(as.data.frame(rlog_out), file=nomname)
 }
 
-
-files <- c()
-snames <- c()
-for (file in files1) {
-    snames <- append(snames, substring(file, first = 0, last = nchar(file) - 14))
-    fname <- paste(dirPath,file,sep="/")
-    files <- append(files,fname)
-}
-for (file in files2) {
-    snames <- append(snames, substring(file, first = 0, last = nchar(file) - 14))
-    fname <- paste(dirPath,file,sep="/")
-    files <- append(files,fname)
-}
-samples <- data.frame("run"=snames,"condition"=conditions)
-names(files) = samples$run
-
-#convert RSEM results
-txi <- tximport(files, type = "rsem")
-txi$length[txi$length == 0] <- 1
-ddsTxi <- DESeqDataSetFromTximport(txi,colData = samples, design = ~ condition)
-
-#filtering, filter low counts to ignore them
-keep <- rowSums(counts(ddsTxi)) >= 10
-ddsTxi <- ddsTxi[keep,]
-
-##### Perform deseq2 #####
-ddsTxi <- DESeq(ddsTxi)
-res <- results(ddsTxi)
-res
-
-#write results
-ofnnname <- paste(firstName,secondName,sep="_vs_")
-ofnname <- paste(dirPath,ofnnname,sep="/")
-ofname <- paste(ofnname,"csv",sep=".")
-write.csv(as.data.frame(res), file=ofname)
-
-#create normalized counts for heatmap
-rlog_out <- assay(rlog(ddsTxi, blind=FALSE)) #normalized count data from the DESeq object
-write.csv(as.data.frame(rlog_out), file="normalizedCounts.csv")        
+     
