@@ -1,5 +1,6 @@
 library("DESeq2")
 library("tximport")
+library("pheatmap")
 
 #parse command line arguments
 #command line usage 1:
@@ -101,6 +102,7 @@ loopIndex <- 0
 
 rlogSet <- c()
 resultsSet <- c()
+foldChanges <- data.frame()
 
 #we actually want to compare the zeroset to itself to make it come out zero in the heatmap
 if(TRUE){
@@ -111,6 +113,7 @@ if(TRUE){
   files <- c()
   snames <- c()
     
+  
     
   #zero set first
   for (file in zeroFiles) {
@@ -162,7 +165,21 @@ if(TRUE){
   nomname <- paste(nomnname,"csv",sep=".")
   write.csv(as.data.frame(rlog_out), file=nomname)   
   
+  #copy row names from rlog_out
+  row.names(foldChanges) <- row.names(rlog_out)
+  
+  #make a temporary dataframe
+  tdf <- data.frame()
+  row.names(tdf) <- row.names(rlog_out)
+  #we may want to filter by pvalue before this step
+  tdf.cbind(select(rlog_out, c('log2FoldChange'))
+  names(tdf)[names(tdf) == 'log2FoldChange'] <- zeroName
+  #fuse dataframes
+  foldChanges <- merge(foldChanges, tdf, by = 'row.names', all = TRUE)
 }
+
+
+
 
 for (set in setFiles) {
   #create conditions
@@ -222,6 +239,15 @@ for (set in setFiles) {
   nomnname <- paste(dirPath,nomnnname,sep="/")
   nomname <- paste(nomnname,"csv",sep=".")
   write.csv(as.data.frame(rlog_out), file=nomname)
+    
+  #make a temporary dataframe
+  tdf <- data.frame()
+  row.names(tdf) <- row.names(rlog_out)
+  #we may want to filter by pvalue before this step
+  tdf.cbind(select(rlog_out, c('log2FoldChange'))
+  names(tdf)[names(tdf) == 'log2FoldChange'] <- zeroName
+  #fuse dataframes
+  foldChanges <- merge(foldChanges, tdf, by = 'row.names', all = TRUE)
 }
 
      
