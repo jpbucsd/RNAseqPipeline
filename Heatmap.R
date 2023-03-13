@@ -5,7 +5,7 @@ library("pheatmap")
 #parse command line arguments
 #command line usage 1:
 
-#Rscript Heatmap.R -Z zeroSet zerofile1.genes.results zerofile2.genes.results ... zerofileN.genes.results -S setN setNfile1.genes.results ... setNfile2.genes.results 
+#Rscript Heatmap.R -Z zeroSet zerofile1.genes.results zerofile2.genes.results ... zerofileN.genes.results -S setN setNfile1.genes.results ... setNfile2.genes.results -d path/to/directory/of/files -o /path/to/output/file/file.pdf 
 
 zeroName <- ""
 zeroFiles <- c()
@@ -19,6 +19,8 @@ zeroSet <- FALSE
 otherSets <- FALSE
 directory <- FALSE
 dirPath <- ""
+outName <- FALSE
+outPath <- ""
 named <- FALSE
 
 indexZ <- 0
@@ -44,6 +46,7 @@ for (arg in args) {
             otherSets = FALSE
             directory = FALSE
             named = FALSE
+            outName = FALSE
             #reset the index
             index = 0
           } else if (substring(arg, first = 1, last = 2) == "-S") {
@@ -54,11 +57,19 @@ for (arg in args) {
             otherSets = TRUE
             directory = FALSE
             named = FALSE
+            outName = FALSE
           } else if (substring(arg, first = 1, last = 2) == "-d") {
             #assume it is -2
             zeroSet = FALSE
             otherSets = FALSE
             directory = TRUE
+            outName = FALSE
+          } else if (substring(arg, first = 1, last = 2) == "-o") {
+            #assume it is -2
+            zeroSet = FALSE
+            otherSets = FALSE
+            directory = FALSE
+            outName = TRUE
           }
     } else {
           if ( zeroSet )
@@ -88,6 +99,9 @@ for (arg in args) {
           } else if (directory)
           {
               dirPath = arg
+          } else if (outName)
+          {
+              outPath = arg
           }
      
     }
@@ -249,5 +263,8 @@ for (set in setFiles) {
   #fuse dataframes
   foldChanges <- merge(foldChanges, tdf, by = 'row.names', all = TRUE)
 }
-
-     
+#use pheatmap to create the heatmap. we want to cluster by genes which are rows
+pheatmap(foldChanges,cluster_rows=TRUE,legend=TRUE,show_rownames=TRUE,show_colnames=TRUE,filename=outName)
+#notes for the future of pheatmap, annotation row will take a dataframe that combines rows into larger groups which will be displayed with an annotation
+#annotation_col does the same for columns. annotation col should be used to group samples. annotation_names_col will display the names
+#main can give a name to the entire plot, fontsize_row and fontsize_col can change the font size which may be helpful
