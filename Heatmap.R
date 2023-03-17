@@ -5,7 +5,7 @@ library("pheatmap")
 #parse command line arguments
 #command line usage 1:
 
-#Rscript Heatmap.R -Z zeroSet zerofile1.genes.results zerofile2.genes.results ... zerofileN.genes.results -S setN setNfile1.genes.results ... setNfile2.genes.results -d path/to/directory/of/files -o /path/to/output/file/file.pdf 
+#Rscript Heatmap.R -Z zeroSet zerofile1.genes.results zerofile2.genes.results ... zerofileN.genes.results -S setN setNfile1.genes.results ... setNfile2.genes.results -d path/to/directory/of/files -o /path/to/output/file -n filename 
 
 zeroName <- ""
 zeroFiles <- c()
@@ -21,6 +21,8 @@ directory <- FALSE
 dirPath <- ""
 outName <- FALSE
 outPath <- ""
+fNamed <- FALSE
+fName <- ""
 named <- FALSE
 
 indexZ <- 0
@@ -47,6 +49,7 @@ for (arg in args) {
             directory = FALSE
             named = FALSE
             outName = FALSE
+            fNamed = FALSE
             #reset the index
             index = 0
           } else if (substring(arg, first = 1, last = 2) == "-S") {
@@ -58,18 +61,27 @@ for (arg in args) {
             directory = FALSE
             named = FALSE
             outName = FALSE
+            fNamed = FALSE
           } else if (substring(arg, first = 1, last = 2) == "-d") {
             #assume it is -2
             zeroSet = FALSE
             otherSets = FALSE
             directory = TRUE
             outName = FALSE
+            fNamed = FALSE
           } else if (substring(arg, first = 1, last = 2) == "-o") {
             #assume it is -2
             zeroSet = FALSE
             otherSets = FALSE
             directory = FALSE
             outName = TRUE
+            fNamed = FALSE
+          } else if (substring(arg, first = 1, last = 2) == "-o") {
+            zeroSet = FALSE
+            otherSets = FALSE
+            directory = FALSE
+            outName = FALSE
+            fNamed = TRUE
           }
     } else {
           if ( zeroSet )
@@ -102,6 +114,9 @@ for (arg in args) {
           } else if (outName)
           {
               outPath = arg
+          } else if (fNamed)
+          {
+              fName = arg
           }
      
     }
@@ -263,10 +278,12 @@ for (set in setFiles) {
   #fuse dataframes
   foldChanges <- merge(foldChanges, tdf, by = 'row.names', all = TRUE)
 }
+write.csv(foldChanges, file=paste(outName, paste(outName, paste(fName, "csv", sep="."), sep="/"))
 #use pheatmap to create the heatmap. we want to cluster by genes which are rows
 #we cannot use a dataframe, foldChanges must be turned into a matrix
 df_num = as.matrix(foldChanges)
-pheatmap(df_num,cluster_rows=TRUE,legend=TRUE,show_rownames=TRUE,show_colnames=TRUE,filename=outName)
+
+pheatmap(df_num,cluster_rows=TRUE,legend=TRUE,show_rownames=TRUE,show_colnames=TRUE,filename=paste(outName, paste(fName, "pdf", sep="."), sep="/"))
 #notes for the future of pheatmap, annotation row will take a dataframe that combines rows into larger groups which will be displayed with an annotation
 #annotation_col does the same for columns. annotation col should be used to group samples. annotation_names_col will display the names
 #main can give a name to the entire plot, fontsize_row and fontsize_col can change the font size which may be helpful
