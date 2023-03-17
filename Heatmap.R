@@ -38,7 +38,7 @@ for (arg in args) {
           {
             #other sets was previously set, finish it up
             indexS[setIndex] = cIndex
-            setFiles.append(setFile)
+            setFiles <- append(setFiles,setFile)
             setFile = c()
             cIndex = 0
           }
@@ -122,9 +122,8 @@ for (arg in args) {
     }
  }
  #the last set file is not added yet
- setFiles.append(setFile)
+ setFiles <- append(setFiles,setFile)
  indexS[setIndex] = cIndex
- setFiles.append(setFile)
 
  
 loopIndex <- 0
