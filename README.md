@@ -58,6 +58,15 @@ This script produces lists of up and down regulated genes, a background list, an
 #####    &emsp;--Llog10 to determine which results are worth naming, a log 10 value as threshold for which values to name
 #####    &emsp;--odir output directory
 
+## Heatmap.R
+This script produces a heatmap and .csv files comparing the control sample to all other samples. This script has not yet been implemented into the complete pipeline but will be in the future.
+#### Rscript Heatmap.R 
+#####    &emsp;-Z zeroSet zerofile1.genes.results zerofile2.genes.results ... zerofileN.genes.results (indicates the control sample name and RSEM files of biological replicates)
+#####    &emsp;-S setN setNfile1.genes.results ... setNfile2.genes.results (indicates the name and RSEM files of biological replicates of a test sample)
+#####    &emsp;-d path/to/directory/of/files (location of RSEM files)
+#####    &emsp;-o /path/to/output/file (location to save outputs)
+#####    &emsp;-n filename (filename for .CSV files of log2fold change and .PDF of heatmap)
+
 
 ## splicingvsexpression.py Usage
 This script is not a part of the pipeline, and is just an additional tool. It has not been configured for reuse and currently takes a log2Fold change .csv and a .csv containing alternative splicing counts and produces a chart comparing the two. 
