@@ -1,7 +1,7 @@
 library("DESeq2")
 library("tximport")
 library("pheatmap")
-
+library("dplyr")
 #parse command line arguments
 #command line usage 1:
 
@@ -244,7 +244,12 @@ write.csv(foldChangesAll, file=paste(outPath, paste(fName, "csv", sep="."), sep=
 #we cannot use a dataframe, foldChanges must be turned into a matrix
 df_num = as.matrix(foldChangesShared)
 
-pheatmap(df_num,cluster_rows=TRUE,legend=TRUE,show_rownames=TRUE,show_colnames=TRUE,filename=paste(outPath, paste(fName, "pdf", sep="."), sep="/"))
+pheatmap(df_num,cluster_rows=TRUE,legend=TRUE,show_rownames=TRUE,show_colnames=TRUE,fontsize_row=1,filename=paste(outPath, paste(fName, "pdf", sep="."), sep="/"))
 #notes for the future of pheatmap, annotation row will take a dataframe that combines rows into larger groups which will be displayed with an annotation
 #annotation_col does the same for columns. annotation col should be used to group samples. annotation_names_col will display the names
 #main can give a name to the entire plot, fontsize_row and fontsize_col can change the font size which may be helpful
+
+#the following code is for a filtered heatmap
+foldChangesFiltered <- foldChangesShared %>% filter_all(any_vars(.>6|-6>.))
+df_num2 = as.matrix(foldChangesFiltered)
+pheatmap(df_num2,cluster_rows=TRUE,legend=TRUE,show_rownames=TRUE,show_colnames=TRUE,fontsize_row=3,filename=paste(outPath, paste(paste(fName,"filtered",sep="_"), "pdf", sep="."), sep="/"))
