@@ -31,6 +31,9 @@ indexS <- c()
 cIndex <- 0
 setIndex <- 0
 
+filtFlag <- FALSE
+filter <- 0
+
 
 for (arg in args) {
     if(substring(arg, first = 1, last = 1) == "-")
@@ -54,6 +57,7 @@ for (arg in args) {
             named = FALSE
             outName = FALSE
             fNamed = FALSE
+            filtFlag = FALSE
             #reset the index
             index = 0
           } else if (substring(arg, first = 1, last = 2) == "-S") {
@@ -66,6 +70,7 @@ for (arg in args) {
             named = FALSE
             outName = FALSE
             fNamed = FALSE
+            filtFlag = FALSE
           } else if (substring(arg, first = 1, last = 2) == "-d") {
             #assume it is -2
             zeroSet = FALSE
@@ -73,6 +78,7 @@ for (arg in args) {
             directory = TRUE
             outName = FALSE
             fNamed = FALSE
+            filtFlag = FALSE
           } else if (substring(arg, first = 1, last = 2) == "-o") {
             #assume it is -2
             zeroSet = FALSE
@@ -80,12 +86,14 @@ for (arg in args) {
             directory = FALSE
             outName = TRUE
             fNamed = FALSE
+            filtFlag = FALSE
           } else if (substring(arg, first = 1, last = 2) == "-n") {
             zeroSet = FALSE
             otherSets = FALSE
             directory = FALSE
             outName = FALSE
             fNamed = TRUE
+            filtFlag = FALSE
           } else if (substring(arg, first = 1, last = 2) == "-c") {
             zeroSet = FALSE
             otherSets = FALSE
@@ -93,6 +101,14 @@ for (arg in args) {
             outName = FALSE
             fNamed = FALSE
             zeroVsAll = TRUE
+            filtFlag = FALSE
+          } else if (substring(arg, first = 1, last = 2) == "-f") {
+            zeroSet = FALSE
+            otherSets = FALSE
+            directory = FALSE
+            outName = FALSE
+            fNamed = FALSE
+            filtFlag = TRUE
           }
     } else {
           if ( zeroSet )
@@ -128,6 +144,9 @@ for (arg in args) {
           } else if (fNamed)
           {
               fName = arg
+          } else if (filtFlag)
+          {
+              filter = arg
           }
      
     }
@@ -178,14 +197,16 @@ for (set in setFiles) {
     txi <- tximport(files, type = "rsem")
     tempFrame<-data.frame(col1=rowMeans(txi$counts,na.rm=TRUE))
     row.names(tempFrame)<-row.names(txi$counts)
-    colnames(countsShared)[1] <- setNames[loopIndex]
+    colnames(tempFrame)[1] <- setNames[loopIndex]
     
     #merge the dataframes
     countsShared <- merge(countsShared, tempFrame, by = 0, all = FALSE)
     row.names(countsShared) = countsShared[,"Row.names"]
     countsShared <- countsShared[,-1]
 }
-
+cnname <- paste(outPath,"counts",sep="/")
+cname <- paste(cnname,"csv",sep=".")
+write.csv(countsShared, file=cname)
 head(countsShared)
 #create a dataframe with the averages and standard deviations of each row for counts
 stats<-data.frame(avg=rowMeans(countsShared,na.rm=TRUE),stdev=apply(countsShared, 1, sd, na.rm=TRUE))
@@ -196,6 +217,20 @@ for(i in 1:nrow(countsShared)) {
 }
 head(countsShared)
 
+#create a heatmap for all genes, with no gene names
+df_all = as.matrix(countsShared)
+pheatmap(df_all,cluster_rows=FALSE,cluster_cols=TRUE,legend=TRUE,show_rownames=FALSE,show_colnames=TRUE,fontsize_row=1,filename=paste(outPath, paste(paste(fName,"zscore_all",sep="_"), "pdf", sep="."), sep="/"))
+
+znname <- paste(outPath,"zscoredcounts",sep="/")
+zname <- paste(znname,"csv",sep=".")
+write.csv(countsShared, file=zname)
+#create a filtered heatmap for filtered genes
+countsFiltered <- countsShared %>% filter_all(any_vars(.>filter|-filter>.))
+
+
+zfnname <- paste(outPath,"zscoredcounts_filtered",sep="/")
+zfname <- paste(zfnname,"csv",sep=".")
+write.csv(countsFiltered, file=zfname)
 
 #the following code produces a heatmap comparing the zero set to all other sets and taking a heatmap of the log2fold.
 if(zeroVsAll)
