@@ -151,7 +151,6 @@ foldChangeInit <- FALSE
 #print(paste(outPath, paste(fName, "csv", sep="."), sep="/"))
 
 #for the zscored heatmap we need a dataframe for counts
-#countsShared <- data.frame()
 
 #this must include the zeroset
 zfiles <- c()
@@ -160,12 +159,41 @@ for (file in zeroFiles) {
       zfiles <- append(zfiles,fname)
 }
 ztxi <- tximport(zfiles, type = "rsem")
-head(ztxi$counts)
+#head(ztxi$counts)
 countsShared<-data.frame(col1=rowMeans(ztxi$counts,na.rm=TRUE))
 
 row.names(countsShared)<-row.names(ztxi$counts)
 colnames(countsShared)[1] <- zeroName
 
+#head(countsShared)
+
+#now add all the other sets
+for (set in setFiles) {
+    loopIndex = loopIndex + 1
+    files <- c()
+    for (file in set) {
+      fname <- paste(dirPath,file,sep="/")
+      files <- append(files,fname)
+    }
+    txi <- tximport(files, type = "rsem")
+    tempFrame<-data.frame(col1=rowMeans(txi$counts,na.rm=TRUE))
+    row.names(tempFrame)<-row.names(txi$counts)
+    colnames(countsShared)[1] <- setNames[loopIndex]
+    
+    #merge the dataframes
+    countsShared <- merge(countsShared, tempFrame, by = 0, all = FALSE)
+    row.names(countsShared) = countsShared[,"Row.names"]
+    countsShared <- countsShared[,-1]
+}
+
+head(countsShared)
+#create a dataframe with the averages and standard deviations of each row for counts
+stats<-data.frame(avg=rowMeans(countsShared,na.rm=TRUE),stdev=apply(countsShared, 1, sd, na.rm=TRUE))
+#zscore the counts
+
+for(i in 1:nrow(countsShared)) {
+    countsShared[i,] <- (countsShared[i,] - stats[i,'stdev'])/stats[i,'avg']
+}
 head(countsShared)
 
 
