@@ -24,6 +24,7 @@ outPath <- ""
 fNamed <- FALSE
 fName <- ""
 named <- FALSE
+zeroVsAll <- FALSE
 
 indexZ <- 0
 indexS <- c()
@@ -85,6 +86,13 @@ for (arg in args) {
             directory = FALSE
             outName = FALSE
             fNamed = TRUE
+          } else if (substring(arg, first = 1, last = 2) == "-c") {
+            zeroSet = FALSE
+            otherSets = FALSE
+            directory = FALSE
+            outName = FALSE
+            fNamed = FALSE
+            zeroVsAll = TRUE
           }
     } else {
           if ( zeroSet )
@@ -142,114 +150,135 @@ foldChangeInit <- FALSE
 #print("outfilename:")
 #print(paste(outPath, paste(fName, "csv", sep="."), sep="/"))
 
-for (set in setFiles) {
-  #create conditions
-  loopIndex = loopIndex + 1
-  conditions <- c(rep(zeroName,indexZ),rep(setNames[loopIndex],indexS[loopIndex]))
-  
-  #resume converting from below
-  files <- c()
-  snames <- c()
-  #zero set first
-  for (file in zeroFiles) {
-      snames <- append(snames, substring(file, first = 0, last = nchar(file) - 14))
-      fname <- paste(dirPath,file,sep="/")
-      files <- append(files,fname)
-  }
-  
-  for (file in set) {
-      print(file)
-      snames <- append(snames, substring(file, first = 0, last = nchar(file) - 14))
-      fname <- paste(dirPath,file,sep="/")
-      files <- append(files,fname)
-  }
-  print(cat("set ",loopIndex," ",setNames[loopIndex]))
-  samples <- data.frame("run"=snames,"condition"=conditions)
-  names(files) = samples$run
-  #convert RSEM results
-  txi <- tximport(files, type = "rsem")
-  txi$length[txi$length == 0] <- 1
-  ddsTxi <- DESeqDataSetFromTximport(txi,colData = samples, design = ~ condition)
-  #filtering, filter low counts to ignore them
-  keep <- rowSums(counts(ddsTxi)) >= 10
-  ddsTxi <- ddsTxi[keep,]
+#for the zscored heatmap we need a dataframe for counts
+countsShared <- data.frame()
 
-  ##### Perform deseq2 #####
-  ddsTxi <- DESeq(ddsTxi)
-  res <- results(ddsTxi)
-  #resultsSet <- append(resultsSet,res)
-  #res contains the results for this one
-  #write results
-  ofnnname <- paste(zeroName,setNames[loopIndex],sep="_vs_")
-  ofnname <- paste(outPath,ofnnname,sep="/")
-  ofname <- paste(ofnname,"csv",sep=".")
-  write.csv(as.data.frame(res), file=ofname)
-
-  #create normalized counts for heatmap
-  rlog_out <- assay(rlog(ddsTxi, blind=FALSE)) #normalized count data from the DESeq object
-   
-  rlogSet <- append(rlogSet,rlog_out)  
-  
-  nomnnnname <- paste(zeroName,setNames[loopIndex],sep="_vs_")
-  nomnnname <- paste(nomnnnname,"normalizedCounts",sep="_")
-  nomnname <- paste(outPath,nomnnname,sep="/")
-  nomname <- paste(nomnname,"csv",sep=".")
-  write.csv(as.data.frame(rlog_out), file=nomname)
-  
-  
-  #rlog out will contain data for comparing each replicant. we do not want this as this is whats produced by heatmap.py
-  #res contains log2foldchange for the entire sample against the zero.
-  
-  #make a temporary dataframe
-  tdf <- data.frame(matrix(0, ncol = 1, nrow = length(row.names(res))))
-  #print(length(row.names(tdf)))
-  row.names(tdf) <- row.names(res)
-  #we may want to filter by pvalue before this step
-  tdf[,1] <- res[,"log2FoldChange"]
-  #tdf.cbind(res[,c('log2FoldChange')])
-  #names(tdf)[names(tdf) == 'log2FoldChange'] <- setNames[loopIndex]
-  #print(setNames[loopIndex])
-  colnames(tdf)[1] <- setNames[loopIndex]
-  
-  if(foldChangeInit)
-  { 
-    #fuse new data with previous dataframe, keeping all genes even if they do not appear in each sample. this is for the csv.
-    foldChangesAll <- merge(foldChangesAll, tdf, by = 0, all = TRUE)
-    #the gene names have now become a column, make the row names the gene names
-    row.names(foldChangesAll) = foldChangesAll[,"Row.names"]
-    #remove the column containing row names
-    foldChangesAll <- foldChangesAll[,-1]
-  
-    #repeat for the shared dataframe, but removing genes only existing in one file. this is for the heatmap.
-    #fuse new data with previous dataframe, keeping all genes even if they do not appear in each sampl
-    foldChangesShared <- merge(foldChangesShared, tdf, by = 0, all = FALSE)
-    row.names(foldChangesShared) = foldChangesShared[,"Row.names"]
-    foldChangesShared <- foldChangesShared[,-1]
-  }else{
-    #the dataframes are empty. they should just be identical to tdf
-    foldChangesAll <- tdf
-    foldChangesShared <- tdf
-    foldChangeInit <- TRUE
-  }
-  #print("debug fold changes ")
-  #print(head(foldChangesAll,10))
-  #print(tail(foldChangesAll,10))
-  #print("fold changes all^")
-  #print(head(foldChangesShared,10))
-  #print(tail(foldChangesShared,10))
-  #print("fold changes shared^")
+#this must include the zeroset
+zfiles <- c()
+for (file in zeroFiles) {
+      fname <- paste(dirPath,file,sep="/")
+      zfiles <- append(zfiles,fname)
 }
-write.csv(foldChangesAll, file=paste(outPath, paste(fName, "csv", sep="."), sep="/"))
-#use pheatmap to create the heatmap. we want to cluster by genes which are rows
-#we cannot use a dataframe, foldChanges must be turned into a matrix
-df_num = as.matrix(foldChangesShared)
+ztxi <- tximport(zfiles, type = "rsem")
+zeroFrame <- ztxi$counts
+row.names(countsShared) <- row.names(zeroFrame)
 
-pheatmap(df_num,cluster_rows=TRUE,legend=TRUE,show_rownames=TRUE,show_colnames=TRUE,fontsize_row=1,filename=paste(outPath, paste(fName, "pdf", sep="."), sep="/"))
-#notes for the future of pheatmap, annotation row will take a dataframe that combines rows into larger groups which will be displayed with an annotation
-#annotation_col does the same for columns. annotation col should be used to group samples. annotation_names_col will display the names
-#main can give a name to the entire plot, fontsize_row and fontsize_col can change the font size which may be helpful
+countsShared <- rowMeans(zeroFrame, na.rm=TRUE)
+head(countsShared)
 
-#the following code is for a filtered heatmap
-foldChangesFiltered <- foldChangesShared %>% filter_all(any_vars(.>6|-6>.))
-df_num2 = as.matrix(foldChangesFiltered)
-pheatmap(df_num2,cluster_rows=TRUE,legend=TRUE,show_rownames=TRUE,show_colnames=TRUE,fontsize_row=3,filename=paste(outPath, paste(paste(fName,"filtered",sep="_"), "pdf", sep="."), sep="/"))
+
+#the following code produces a heatmap comparing the zero set to all other sets and taking a heatmap of the log2fold.
+if(zeroVsAll)
+{
+    for (set in setFiles) {
+      #create conditions
+      loopIndex = loopIndex + 1
+      conditions <- c(rep(zeroName,indexZ),rep(setNames[loopIndex],indexS[loopIndex]))
+
+      #resume converting from below
+      files <- c()
+      snames <- c()
+      #zero set first
+      for (file in zeroFiles) {
+          snames <- append(snames, substring(file, first = 0, last = nchar(file) - 14))
+          fname <- paste(dirPath,file,sep="/")
+          files <- append(files,fname)
+      }
+
+      for (file in set) {
+          print(file)
+          snames <- append(snames, substring(file, first = 0, last = nchar(file) - 14))
+          fname <- paste(dirPath,file,sep="/")
+          files <- append(files,fname)
+      }
+      print(cat("set ",loopIndex," ",setNames[loopIndex]))
+      samples <- data.frame("run"=snames,"condition"=conditions)
+      names(files) = samples$run
+      #convert RSEM results
+      txi <- tximport(files, type = "rsem")
+      txi$length[txi$length == 0] <- 1
+      ddsTxi <- DESeqDataSetFromTximport(txi,colData = samples, design = ~ condition)
+      #filtering, filter low counts to ignore them
+      keep <- rowSums(counts(ddsTxi)) >= 10
+      ddsTxi <- ddsTxi[keep,]
+
+      ##### Perform deseq2 #####
+      ddsTxi <- DESeq(ddsTxi)
+      res <- results(ddsTxi)
+      #resultsSet <- append(resultsSet,res)
+      #res contains the results for this one
+      #write results
+      ofnnname <- paste(zeroName,setNames[loopIndex],sep="_vs_")
+      ofnname <- paste(outPath,ofnnname,sep="/")
+      ofname <- paste(ofnname,"csv",sep=".")
+      write.csv(as.data.frame(res), file=ofname)
+
+      #create normalized counts for heatmap
+      rlog_out <- assay(rlog(ddsTxi, blind=FALSE)) #normalized count data from the DESeq object
+
+      rlogSet <- append(rlogSet,rlog_out)  
+
+      nomnnnname <- paste(zeroName,setNames[loopIndex],sep="_vs_")
+      nomnnname <- paste(nomnnnname,"normalizedCounts",sep="_")
+      nomnname <- paste(outPath,nomnnname,sep="/")
+      nomname <- paste(nomnname,"csv",sep=".")
+      write.csv(as.data.frame(rlog_out), file=nomname)
+
+
+      #rlog out will contain data for comparing each replicant. we do not want this as this is whats produced by heatmap.py
+      #res contains log2foldchange for the entire sample against the zero.
+
+      #make a temporary dataframe
+      tdf <- data.frame(matrix(0, ncol = 1, nrow = length(row.names(res))))
+      #print(length(row.names(tdf)))
+      row.names(tdf) <- row.names(res)
+      #we may want to filter by pvalue before this step
+      tdf[,1] <- res[,"log2FoldChange"]
+      #tdf.cbind(res[,c('log2FoldChange')])
+      #names(tdf)[names(tdf) == 'log2FoldChange'] <- setNames[loopIndex]
+      #print(setNames[loopIndex])
+      colnames(tdf)[1] <- setNames[loopIndex]
+
+      if(foldChangeInit)
+      { 
+        #fuse new data with previous dataframe, keeping all genes even if they do not appear in each sample. this is for the csv.
+        foldChangesAll <- merge(foldChangesAll, tdf, by = 0, all = TRUE)
+        #the gene names have now become a column, make the row names the gene names
+        row.names(foldChangesAll) = foldChangesAll[,"Row.names"]
+        #remove the column containing row names
+        foldChangesAll <- foldChangesAll[,-1]
+
+        #repeat for the shared dataframe, but removing genes only existing in one file. this is for the heatmap.
+        #fuse new data with previous dataframe, keeping all genes even if they do not appear in each sampl
+        foldChangesShared <- merge(foldChangesShared, tdf, by = 0, all = FALSE)
+        row.names(foldChangesShared) = foldChangesShared[,"Row.names"]
+        foldChangesShared <- foldChangesShared[,-1]
+      }else{
+        #the dataframes are empty. they should just be identical to tdf
+        foldChangesAll <- tdf
+        foldChangesShared <- tdf
+        foldChangeInit <- TRUE
+      }
+      #print("debug fold changes ")
+      #print(head(foldChangesAll,10))
+      #print(tail(foldChangesAll,10))
+      #print("fold changes all^")
+      #print(head(foldChangesShared,10))
+      #print(tail(foldChangesShared,10))
+      #print("fold changes shared^")
+    }
+    write.csv(foldChangesAll, file=paste(outPath, paste(fName, "csv", sep="."), sep="/"))
+    #use pheatmap to create the heatmap. we want to cluster by genes which are rows
+    #we cannot use a dataframe, foldChanges must be turned into a matrix
+    df_num = as.matrix(foldChangesShared)
+
+    pheatmap(df_num,cluster_rows=TRUE,legend=TRUE,show_rownames=TRUE,show_colnames=TRUE,fontsize_row=1,filename=paste(outPath, paste(fName, "pdf", sep="."), sep="/"))
+    #notes for the future of pheatmap, annotation row will take a dataframe that combines rows into larger groups which will be displayed with an annotation
+    #annotation_col does the same for columns. annotation col should be used to group samples. annotation_names_col will display the names
+    #main can give a name to the entire plot, fontsize_row and fontsize_col can change the font size which may be helpful
+
+    #the following code is for a filtered heatmap
+    foldChangesFiltered <- foldChangesShared %>% filter_all(any_vars(.>6|-6>.))
+    df_num2 = as.matrix(foldChangesFiltered)
+    pheatmap(df_num2,cluster_rows=TRUE,legend=TRUE,show_rownames=TRUE,show_colnames=TRUE,fontsize_row=3,filename=paste(outPath, paste(paste(fName,"filtered",sep="_"), "pdf", sep="."), sep="/"))
+}
