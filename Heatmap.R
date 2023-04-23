@@ -219,16 +219,15 @@ head(countsShared)
 
 #create a heatmap for all genes, with no gene names
 df_all = as.matrix(countsShared)
-pheatmap(df_all,cluster_rows=FALSE,cluster_cols=TRUE,legend=TRUE,show_rownames=FALSE,show_colnames=TRUE,fontsize_row=1,filename=paste(outPath, paste(paste(fName,"zscore_all",sep="_"), "pdf", sep="."), sep="/"))
+pheatmap(df_all,cluster_rows=FALSE,cluster_cols=FALSE,legend=TRUE,show_rownames=FALSE,show_colnames=TRUE,fontsize_row=1,filename=paste(outPath, paste(paste(fName,"zscore_all",sep="_"), "pdf", sep="."), sep="/"))
 
 znname <- paste(outPath,"zscoredcounts",sep="/")
 zname <- paste(znname,"csv",sep=".")
 write.csv(countsShared, file=zname)
 #create a filtered heatmap for filtered genes
-countsFiltered <- countsShared %>% filter_all(any_vars(.>filter|-filter>.))
-df_filt = as.matrix(countsShared)
-pheatmap(df_filt,cluster_rows=FALSE,cluster_cols=TRUE,legend=TRUE,show_rownames=FALSE,show_colnames=TRUE,fontsize_row=1,filename=paste(outPath, paste(paste(fName,"zscore_filtered",sep="_"), "pdf", sep="."), sep="/"))
-
+countsFiltered <- countsShared %>% filter_all(any_vars(.>as.double(filter)|-(as.double(filter))>.))
+df_filt = as.matrix(countsFiltered)
+pheatmap(df_filt,cluster_rows=TRUE,cluster_cols=FALSE,legend=TRUE,show_rownames=FALSE,show_colnames=TRUE,fontsize_row=1,filename=paste(outPath, paste(paste(fName,"zscore_filtered",sep="_"), "pdf", sep="."), sep="/"))
 
 zfnname <- paste(outPath,"zscoredcounts_filtered",sep="/")
 zfname <- paste(zfnname,"csv",sep=".")
