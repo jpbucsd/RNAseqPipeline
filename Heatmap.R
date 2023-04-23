@@ -151,7 +151,7 @@ foldChangeInit <- FALSE
 #print(paste(outPath, paste(fName, "csv", sep="."), sep="/"))
 
 #for the zscored heatmap we need a dataframe for counts
-countsShared <- data.frame()
+#countsShared <- data.frame()
 
 #this must include the zeroset
 zfiles <- c()
@@ -160,10 +160,12 @@ for (file in zeroFiles) {
       zfiles <- append(zfiles,fname)
 }
 ztxi <- tximport(zfiles, type = "rsem")
-zeroFrame <- ztxi$counts
-row.names(countsShared) <- row.names(zeroFrame)
+head(ztxi$counts)
+countsShared<-data.frame(col1=rowMeans(ztxi$counts,na.rm=TRUE))
 
-countsShared <- rowMeans(zeroFrame, na.rm=TRUE)
+row.names(countsShared)<-row.names(ztxi$counts)
+colnames(countsShared)[1] <- zeroName
+
 head(countsShared)
 
 
