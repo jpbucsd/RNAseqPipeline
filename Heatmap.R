@@ -226,6 +226,8 @@ zname <- paste(znname,"csv",sep=".")
 write.csv(countsShared, file=zname)
 #create a filtered heatmap for filtered genes
 countsFiltered <- countsShared %>% filter_all(any_vars(.>filter|-filter>.))
+df_filt = as.matrix(countsShared)
+pheatmap(df_filt,cluster_rows=FALSE,cluster_cols=TRUE,legend=TRUE,show_rownames=FALSE,show_colnames=TRUE,fontsize_row=1,filename=paste(outPath, paste(paste(fName,"zscore_filtered",sep="_"), "pdf", sep="."), sep="/"))
 
 
 zfnname <- paste(outPath,"zscoredcounts_filtered",sep="/")
