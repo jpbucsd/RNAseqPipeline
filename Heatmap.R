@@ -34,6 +34,7 @@ setIndex <- 0
 filtFlag <- FALSE
 filter <- 0
 
+mathArtifact <- FALSE
 
 for (arg in args) {
     if(substring(arg, first = 1, last = 1) == "-")
@@ -109,6 +110,14 @@ for (arg in args) {
             outName = FALSE
             fNamed = FALSE
             filtFlag = TRUE
+          } else if (substring(arg, first = 1, last = 2) == "-m") {
+            zeroSet = FALSE
+            otherSets = FALSE
+            directory = FALSE
+            outName = FALSE
+            fNamed = FALSE
+            mathArtifact = TRUE
+            filtFlag = FALSE
           }
     } else {
           if ( zeroSet )
@@ -204,22 +213,32 @@ for (set in setFiles) {
     row.names(countsShared) = countsShared[,"Row.names"]
     countsShared <- countsShared[,-1]
 }
+
 cnname <- paste(outPath,"counts",sep="/")
 cname <- paste(cnname,"csv",sep=".")
 write.csv(countsShared, file=cname)
 head(countsShared)
+
+#if this dataframe is zscored, meaningful data may be obscured by the pressence of rows where only one sample has counts, which produces the highest zscore. These will be considered mathematical artifacts with the -m flag and removed
+if(mathArtifact)
+{
+  #countsShared <- countsShared[rowSums(countsShared == 0) < ncol(countsShared)-1,]
+  #the above line of code removes lines where only one of the rows is not 0, however it appears to truly remove artifacts, all rows that are not zero must be removed
+  countsShared <- countsShared[rowSums(countsShared == 0) ==0,]
+}
+
 #create a dataframe with the averages and standard deviations of each row for counts
 stats<-data.frame(avg=rowMeans(countsShared,na.rm=TRUE),stdev=apply(countsShared, 1, sd, na.rm=TRUE))
 #zscore the counts
 
 for(i in 1:nrow(countsShared)) {
-    countsShared[i,] <- (countsShared[i,] - stats[i,'stdev'])/stats[i,'avg']
+    countsShared[i,] <- (countsShared[i,] - stats[i,'avg'])/stats[i,'stdev']
 }
 head(countsShared)
 
 #create a heatmap for all genes, with no gene names
 df_all = as.matrix(countsShared)
-pheatmap(df_all,cluster_rows=FALSE,cluster_cols=FALSE,legend=TRUE,show_rownames=FALSE,show_colnames=TRUE,fontsize_row=1,filename=paste(outPath, paste(paste(fName,"zscore_all",sep="_"), "pdf", sep="."), sep="/"))
+pheatmap(df_all,cluster_rows=FALSE,cluster_cols=FALSE,legend=TRUE,show_rownames=FALSE,show_colnames=TRUE,fontsize_row=1,color=colorRampPalette(c("navy", "white", "red"))(50),filename=paste(outPath, paste(paste(fName,"zscore_all",sep="_"), "pdf", sep="."), sep="/"))
 
 znname <- paste(outPath,"zscoredcounts",sep="/")
 zname <- paste(znname,"csv",sep=".")
@@ -227,11 +246,12 @@ write.csv(countsShared, file=zname)
 #create a filtered heatmap for filtered genes
 countsFiltered <- countsShared %>% filter_all(any_vars(.>as.double(filter)|-(as.double(filter))>.))
 df_filt = as.matrix(countsFiltered)
-pheatmap(df_filt,cluster_rows=TRUE,cluster_cols=FALSE,legend=TRUE,show_rownames=FALSE,show_colnames=TRUE,fontsize_row=1,filename=paste(outPath, paste(paste(fName,"zscore_filtered",sep="_"), "pdf", sep="."), sep="/"))
 
 zfnname <- paste(outPath,"zscoredcounts_filtered",sep="/")
 zfname <- paste(zfnname,"csv",sep=".")
 write.csv(countsFiltered, file=zfname)
+
+pheatmap(df_filt,cluster_rows=TRUE,cluster_cols=FALSE,legend=TRUE,show_rownames=TRUE,show_colnames=TRUE,fontsize_row=1,color=colorRampPalette(c("navy", "white", "red"))(50),filename=paste(outPath, paste(paste(fName,"zscore_filtered",sep="_"), "pdf", sep="."), sep="/"))
 
 #the following code produces a heatmap comparing the zero set to all other sets and taking a heatmap of the log2fold.
 if(zeroVsAll)
@@ -338,7 +358,7 @@ if(zeroVsAll)
     #we cannot use a dataframe, foldChanges must be turned into a matrix
     df_num = as.matrix(foldChangesShared)
 
-    pheatmap(df_num,cluster_rows=TRUE,legend=TRUE,show_rownames=TRUE,show_colnames=TRUE,fontsize_row=1,filename=paste(outPath, paste(fName, "pdf", sep="."), sep="/"))
+    pheatmap(df_num,cluster_rows=TRUE,legend=TRUE,show_rownames=TRUE,show_colnames=TRUE,fontsize_row=1,color=colorRampPalette(c("navy", "white", "red"))(50),filename=paste(outPath, paste(fName, "pdf", sep="."), sep="/"))
     #notes for the future of pheatmap, annotation row will take a dataframe that combines rows into larger groups which will be displayed with an annotation
     #annotation_col does the same for columns. annotation col should be used to group samples. annotation_names_col will display the names
     #main can give a name to the entire plot, fontsize_row and fontsize_col can change the font size which may be helpful
@@ -346,5 +366,5 @@ if(zeroVsAll)
     #the following code is for a filtered heatmap
     foldChangesFiltered <- foldChangesShared %>% filter_all(any_vars(.>6|-6>.))
     df_num2 = as.matrix(foldChangesFiltered)
-    pheatmap(df_num2,cluster_rows=TRUE,legend=TRUE,show_rownames=TRUE,show_colnames=TRUE,fontsize_row=3,filename=paste(outPath, paste(paste(fName,"filtered",sep="_"), "pdf", sep="."), sep="/"))
+    pheatmap(df_num2,cluster_rows=TRUE,legend=TRUE,show_rownames=TRUE,show_colnames=TRUE,fontsize_row=3,color=colorRampPalette(c("navy", "white", "red"))(50),filename=paste(outPath, paste(paste(fName,"filtered",sep="_"), "pdf", sep="."), sep="/"))
 }
