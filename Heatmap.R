@@ -272,14 +272,15 @@ zfnname <- paste(outPath,"zscoredcounts_filtered",sep="/")
 zfname <- paste(zfnname,"csv",sep=".")
 write.csv(countsFiltered, file=zfname)
 
+print("heat")
 heat <- pheatmap(df_filt,cluster_rows=TRUE,cluster_cols=FALSE,legend=TRUE,show_rownames=TRUE,show_colnames=TRUE,fontsize_row=1,color=colorRampPalette(c("navy", "white", "red"))(50),filename=paste(outPath, paste(paste(fName,"zscore_filtered",sep="_"), "pdf", sep="."), sep="/"))
 if(numClusters > 1)
 {
-    #get all clusters
+    print("get all clusters")
     hclusters <-heat$tree_row
-    #turn into the # of clusters desired
+    print("turn into the # of clusters desired")
     nclusters <- cutree(hclusters, numClusters)
-    #print the clusters to a txt
+    print("print the clusters to a txt")
     write.table(nclusters,file=paste(outPath, paste(paste(fName,"zscore_filtered_clusters",sep="_"), "txt", sep="."), sep="/"),sep=",",col.names=TRUE,row.names=TRUE);
 }
 
