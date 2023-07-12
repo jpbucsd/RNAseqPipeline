@@ -34,6 +34,9 @@ setIndex <- 0
 filtFlag <- FALSE
 filter <- 0
 
+numFlag <- FALSE
+numClusters <- 0
+
 mathArtifact <- FALSE
 
 for (arg in args) {
@@ -59,6 +62,7 @@ for (arg in args) {
             outName = FALSE
             fNamed = FALSE
             filtFlag = FALSE
+            numFlag = FALSE
             #reset the index
             index = 0
           } else if (substring(arg, first = 1, last = 2) == "-S") {
@@ -72,6 +76,7 @@ for (arg in args) {
             outName = FALSE
             fNamed = FALSE
             filtFlag = FALSE
+            numFlag = FALSE
           } else if (substring(arg, first = 1, last = 2) == "-d") {
             #assume it is -2
             zeroSet = FALSE
@@ -80,6 +85,7 @@ for (arg in args) {
             outName = FALSE
             fNamed = FALSE
             filtFlag = FALSE
+            numFlag = FALSE
           } else if (substring(arg, first = 1, last = 2) == "-o") {
             #assume it is -2
             zeroSet = FALSE
@@ -88,6 +94,7 @@ for (arg in args) {
             outName = TRUE
             fNamed = FALSE
             filtFlag = FALSE
+            numFlag = FALSE
           } else if (substring(arg, first = 1, last = 2) == "-n") {
             zeroSet = FALSE
             otherSets = FALSE
@@ -95,6 +102,7 @@ for (arg in args) {
             outName = FALSE
             fNamed = TRUE
             filtFlag = FALSE
+            numFlag = FALSE
           } else if (substring(arg, first = 1, last = 2) == "-c") {
             zeroSet = FALSE
             otherSets = FALSE
@@ -103,6 +111,7 @@ for (arg in args) {
             fNamed = FALSE
             zeroVsAll = TRUE
             filtFlag = FALSE
+            numFlag = FALSE
           } else if (substring(arg, first = 1, last = 2) == "-f") {
             zeroSet = FALSE
             otherSets = FALSE
@@ -110,6 +119,15 @@ for (arg in args) {
             outName = FALSE
             fNamed = FALSE
             filtFlag = TRUE
+            numFlag = FALSE
+          }else if (substring(arg, first = 1, last = 2) == "-G") {
+            zeroSet = FALSE
+            otherSets = FALSE
+            directory = FALSE
+            outName = FALSE
+            fNamed = FALSE
+            filtFlag = FALSE
+            numFlag = TRUE
           } else if (substring(arg, first = 1, last = 2) == "-m") {
             zeroSet = FALSE
             otherSets = FALSE
@@ -156,6 +174,9 @@ for (arg in args) {
           } else if (filtFlag)
           {
               filter = arg
+          } else if (numFlag)
+          {
+              numClusters = arg
           }
      
     }
@@ -366,5 +387,15 @@ if(zeroVsAll)
     #the following code is for a filtered heatmap
     foldChangesFiltered <- foldChangesShared %>% filter_all(any_vars(.>6|-6>.))
     df_num2 = as.matrix(foldChangesFiltered)
-    pheatmap(df_num2,cluster_rows=TRUE,legend=TRUE,show_rownames=TRUE,show_colnames=TRUE,fontsize_row=3,color=colorRampPalette(c("navy", "white", "red"))(50),filename=paste(outPath, paste(paste(fName,"filtered",sep="_"), "pdf", sep="."), sep="/"))
+    heatm <- pheatmap(df_num2,cluster_rows=TRUE,legend=TRUE,show_rownames=TRUE,show_colnames=TRUE,fontsize_row=3,color=colorRampPalette(c("navy", "white", "red"))(50),filename=paste(outPath, paste(paste(fName,"filtered",sep="_"), "pdf", sep="."), sep="/"))
+    if(numClusters > 1)
+    {
+        #get all clusters
+        hclusters <-heat$tree_row
+        #turn into the # of clusters desired
+        nclusters <- cutree(hc, numClusters)
+        #print the clusters
+        write.table(nclusters,file=paste(outPath, paste(paste(fName,"filteredClusters",sep="_"), "txt", sep="."), sep="/"),sep=",",col.names=TRUE,row.names=TRUE);
+    }
+    
 }
