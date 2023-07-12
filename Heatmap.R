@@ -278,7 +278,7 @@ if(numClusters > 1)
     #get all clusters
     hclusters <-heat$tree_row
     #turn into the # of clusters desired
-    nclusters <- cutree(hc, numClusters)
+    nclusters <- cutree(hclusters, numClusters)
     #print the clusters to a txt
     write.table(nclusters,file=paste(outPath, paste(paste(fName,"zscore_filtered_clusters",sep="_"), "txt", sep="."), sep="/"),sep=",",col.names=TRUE,row.names=TRUE);
 }
