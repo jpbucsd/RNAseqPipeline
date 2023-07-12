@@ -272,7 +272,16 @@ zfnname <- paste(outPath,"zscoredcounts_filtered",sep="/")
 zfname <- paste(zfnname,"csv",sep=".")
 write.csv(countsFiltered, file=zfname)
 
-pheatmap(df_filt,cluster_rows=TRUE,cluster_cols=FALSE,legend=TRUE,show_rownames=TRUE,show_colnames=TRUE,fontsize_row=1,color=colorRampPalette(c("navy", "white", "red"))(50),filename=paste(outPath, paste(paste(fName,"zscore_filtered",sep="_"), "pdf", sep="."), sep="/"))
+heat <- pheatmap(df_filt,cluster_rows=TRUE,cluster_cols=FALSE,legend=TRUE,show_rownames=TRUE,show_colnames=TRUE,fontsize_row=1,color=colorRampPalette(c("navy", "white", "red"))(50),filename=paste(outPath, paste(paste(fName,"zscore_filtered",sep="_"), "pdf", sep="."), sep="/"))
+if(numClusters > 1)
+{
+    #get all clusters
+    hclusters <-heat$tree_row
+    #turn into the # of clusters desired
+    nclusters <- cutree(hc, numClusters)
+    #print the clusters to a txt
+    write.table(nclusters,file=paste(outPath, paste(paste(fName,"zscore_filtered_clusters",sep="_"), "txt", sep="."), sep="/"),sep=",",col.names=TRUE,row.names=TRUE);
+}
 
 #the following code produces a heatmap comparing the zero set to all other sets and taking a heatmap of the log2fold.
 if(zeroVsAll)
@@ -387,15 +396,6 @@ if(zeroVsAll)
     #the following code is for a filtered heatmap
     foldChangesFiltered <- foldChangesShared %>% filter_all(any_vars(.>6|-6>.))
     df_num2 = as.matrix(foldChangesFiltered)
-    heatm <- pheatmap(df_num2,cluster_rows=TRUE,legend=TRUE,show_rownames=TRUE,show_colnames=TRUE,fontsize_row=3,color=colorRampPalette(c("navy", "white", "red"))(50),filename=paste(outPath, paste(paste(fName,"filtered",sep="_"), "pdf", sep="."), sep="/"))
-    if(numClusters > 1)
-    {
-        #get all clusters
-        hclusters <-heat$tree_row
-        #turn into the # of clusters desired
-        nclusters <- cutree(hc, numClusters)
-        #print the clusters
-        write.table(nclusters,file=paste(outPath, paste(paste(fName,"filteredClusters",sep="_"), "txt", sep="."), sep="/"),sep=",",col.names=TRUE,row.names=TRUE);
-    }
+    pheatmap(df_num2,cluster_rows=TRUE,legend=TRUE,show_rownames=TRUE,show_colnames=TRUE,fontsize_row=3,color=colorRampPalette(c("navy", "white", "red"))(50),filename=paste(outPath, paste(paste(fName,"filtered",sep="_"), "pdf", sep="."), sep="/"))
     
 }
