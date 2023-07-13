@@ -283,7 +283,7 @@ if(numClusters > 1)
     write.table(nclusters,file=paste(outPath, paste(paste(fName,"zscore_filtered_clusters",sep="_"), "txt", sep="."), sep="/"),sep=",",col.names=TRUE,row.names=TRUE);
     #separate by cluster
     for (x in 1:numClusters) {
-        write.table(nclusters[,as.character(x)],file=paste(outPath, paste(paste(fName,paste("zscore_filtered_clusters",as.character(x),sep="_"),sep="_"), "txt", sep="."), sep="/"),sep="\t",col.names=FALSE,row.names=FALSE,quote=FALSE)
+        write.table(nclusters[nclusters[,2]==as.character(x),],file=paste(outPath, paste(paste(fName,paste("zscore_filtered_clusters",as.character(x),sep="_"),sep="_"), "txt", sep="."), sep="/"),sep="\t",col.names=FALSE,row.names=FALSE,quote=FALSE)
     }
 }
 
