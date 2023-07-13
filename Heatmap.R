@@ -281,6 +281,10 @@ if(numClusters > 1)
     nclusters <- cutree(hclusters, numClusters)
     #print the clusters to a txt
     write.table(nclusters,file=paste(outPath, paste(paste(fName,"zscore_filtered_clusters",sep="_"), "txt", sep="."), sep="/"),sep=",",col.names=TRUE,row.names=TRUE);
+    #separate by cluster
+    for (x in 1:numClusters) {
+        write.table(nclusters[,as.character(x)],file=paste(outPath, paste(paste(fName,paste("zscore_filtered_clusters",as.character(x),sep="_"),sep="_"), "txt", sep="."), sep="/"),sep="\t",col.names=FALSE,row.names=FALSE,quote=FALSE)
+    }
 }
 
 #the following code produces a heatmap comparing the zero set to all other sets and taking a heatmap of the log2fold.
