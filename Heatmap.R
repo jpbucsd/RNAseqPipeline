@@ -282,9 +282,13 @@ if(numClusters > 1)
     #print the clusters to a txt
     write.table(nclusters,file=paste(outPath, paste(paste(fName,"zscore_filtered_clusters",sep="_"), "txt", sep="."), sep="/"),sep=",",col.names=TRUE,row.names=TRUE);
     #separate by cluster
+    #convert to dataframe
+    dfc = data.frame(nclusters)
+    #print(rownames(dfc)[dfc[,1] == 1])
     for (x in 1:numClusters) {
-        write.table(nclusters[nclusters[,2]==as.character(x),],file=paste(outPath, paste(paste(fName,paste("zscore_filtered_clusters",as.character(x),sep="_"),sep="_"), "txt", sep="."), sep="/"),sep="\t",col.names=FALSE,row.names=FALSE,quote=FALSE)
+        write.table(rownames(dfc)[dfc[,1] == x],file=paste(outPath, paste(paste(fName,paste("zscore_filtered_clusters",as.character(x),sep="_"),sep="_"), "txt", sep="."), sep="/"),sep="\t",col.names=FALSE,row.names=FALSE,quote=FALSE)
     }
+    write.table(rownames(dfc),file=paste(outPath, paste(paste(fName,paste("zscore_filtered_clusters","background",sep="_"),sep="_"), "txt", sep="."), sep="/"),sep="\t",col.names=FALSE,row.names=FALSE,quote=FALSE)
 }
 
 #the following code produces a heatmap comparing the zero set to all other sets and taking a heatmap of the log2fold.
