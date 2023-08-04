@@ -66,6 +66,9 @@ This script produces a heatmap and .csv files comparing the control sample to al
 #####    &emsp;-d path/to/directory/of/files (location of RSEM files)
 #####    &emsp;-o /path/to/output/file (location to save outputs)
 #####    &emsp;-n filename (filename for .CSV files of log2fold change and .PDF of heatmap)
+#####    &emsp;-f filtering by zscore (the threshold for the highest zscore among samples for a gene to appear in the heatmap)
+#####    &emsp;-G specifies the number of clusters desired for downloading gene lists
+#####    &emsp;-m remove mathematical artifacts that may disrupt filtering and clustering
 
 
 ## splicingvsexpression.py Usage
